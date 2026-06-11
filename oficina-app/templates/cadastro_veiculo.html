@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastro de Veículo{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-car-front-fill"></i> Cadastrar Novo Veículo</h5>
+            </div>
+            <div class="card-body">
+                <form id="formCadastroVeiculo">
+                    <!-- CLIENTE -->
+                    <div class="mb-3">
+                        <label for="cliente_id" class="form-label">
+                            <i class="bi bi-person"></i> Cliente *
+                        </label>
+                        <select 
+                            class="form-control form-select" 
+                            id="cliente_id" 
+                            name="cliente_id"
+                            required
+                        >
+                            <option value="">-- Selecione um cliente --</option>
+                            {% for cliente in clientes %}
+                            <option value="{{ cliente['id'] }}">{{ cliente['nome'] }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">
+                            {% if clientes|length == 0 %}
+                                <i class="bi bi-exclamation-triangle"></i> Nenhum cliente cadastrado.
+                                <a href="/cadastro-cliente">Cadastre um cliente primeiro.</a>
+                            {% endif %}
+                        </small>
+                    </div>
+
+                    <!-- PLACA -->
+                    <div class="mb-3">
+                        <label for="placa" class="form-label">
+                            <i class="bi bi-tag"></i> Placa *
+                        </label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="placa" 
+                            name="placa"
+                            placeholder="ABC1234"
+                            required
+                            minlength="6"
+                            maxlength="10"
+                            oninput="formatarPlaca(this)"
+                        >
+                        <small class="text-muted">Formato: ABC1234</small>
+                    </div>
+
+                    <!-- MARCA -->
+                    <div class="mb-3">
+                        <label for="marca" class="form-label">
+                            <i class="bi bi-car-front"></i> Marca *
+                        </label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="marca" 
+                            name="marca"
+                            placeholder="Ex: Volkswagen"
+                            required
+                            minlength="2"
+                        >
+                        <small class="text-muted">Mínimo 2 caracteres</small>
+                    </div>
+
+                    <!-- MODELO -->
+                    <div class="mb-3">
+                        <label for="modelo" class="form-label">
+                            <i class="bi bi-car-front"></i> Modelo *
+                        </label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="modelo" 
+                            name="modelo"
+                            placeholder="Ex: Gol"
+                            required
+                            minlength="2"
+                        >
+                        <small class="text-muted">Mínimo 2 caracteres</small>
+                    </div>
+
+                    <!-- ANO -->
+                    <div class="mb-3">
+                        <label for="ano" class="form-label">
+                            <i class="bi bi-calendar"></i> Ano
+                        </label>
+                        <input 
+                            type="number" 
+                            class="form-control" 
+                            id="ano" 
+                            name="ano"
+                            placeholder="2024"
+                            min="1900"
+                            max="2099"
+                        >
+                        <small class="text-muted">Opcional</small>
+                    </div>
+
+                    <!-- COR -->
+                    <div class="mb-3">
+                        <label for="cor" class="form-label">
+                            <i class="bi bi-palette"></i> Cor
+                        </label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="cor" 
+                            name="cor"
+                            placeholder="Ex: Branco"
+                        >
+                        <small class="text-muted">Opcional</small>
+                    </div>
+
+                    <!-- OBSERVAÇÃO -->
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Campos obrigatórios:</strong> Cliente, Placa, Marca e Modelo
+                    </div>
+
+                    <!-- BOTÕES -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Cadastrar Veículo
+                        </button>
+                    </div>
+                </form>
+
+                <div id="loadingIndicator" class="loading">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Processando...</span>
+                    </div>
+                    <p>Cadastrando veículo...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('formCadastroVeiculo').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // Validações
+        const cliente_id = document.getElementById('cliente_id').value.trim();
+        const placa = document.getElementById('placa').value.trim().toUpperCase();
+        const marca = document.getElementById('marca').value.trim();
+        const modelo = document.getElementById('modelo').value.trim();
+        const ano = document.getElementById('ano').value.trim();
+
+        if (!cliente_id) {
+            mostrarErro('❌ Selecione um cliente!');
+            return;
+        }
+
+        if (!placa || placa.length < 6) {
+            mostrarErro('❌ Placa deve ter no mínimo 6 caracteres!');
+            return;
+        }
+
+        if (!marca || marca.length < 2) {
+            mostrarErro('❌ Marca deve ter no mínimo 2 caracteres!');
+            return;
+        }
+
+        if (!modelo || modelo.length < 2) {
+            mostrarErro('❌ Modelo deve ter no mínimo 2 caracteres!');
+            return;
+        }
+
+        if (ano) {
+            const anoInt = parseInt(ano);
+            if (anoInt < 1900 || anoInt > new Date().getFullYear() + 1) {
+                mostrarErro(`❌ Ano deve estar entre 1900 e ${new Date().getFullYear() + 1}!`);
+                return;
+            }
+        }
+
+        // Mostrar loading
+        document.getElementById('loadingIndicator').style.display = 'block';
+
+        try {
+            const response = await fetch('/cadastro-veiculo', {
+                method: 'POST',
+                body: new FormData(this)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                mostrarSucesso(data.mensagem);
+                document.getElementById('formCadastroVeiculo').reset();
+                
+                // Redirecionar para consulta após 2 segundos
+                setTimeout(() => {
+                    window.location.href = '/consulta-veiculo';
+                }, 2000);
+            } else {
+                mostrarErro(data.mensagem);
+            }
+        } catch (error) {
+            mostrarErro('❌ Erro ao cadastrar veículo: ' + error.message);
+        } finally {
+            document.getElementById('loadingIndicador').style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

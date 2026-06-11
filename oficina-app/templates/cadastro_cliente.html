@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastro de Cliente{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-person-plus"></i> Cadastrar Novo Cliente</h5>
+            </div>
+            <div class="card-body">
+                <form id="formCadastroCliente">
+                    <!-- NOME -->
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">
+                            <i class="bi bi-person"></i> Nome Completo *
+                        </label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="nome" 
+                            name="nome"
+                            placeholder="Ex: João Silva"
+                            required
+                            minlength="3"
+                        >
+                        <small class="text-muted">Mínimo 3 caracteres</small>
+                    </div>
+
+                    <!-- TELEFONE -->
+                    <div class="mb-3">
+                        <label for="telefone" class="form-label">
+                            <i class="bi bi-telephone"></i> Telefone *
+                        </label>
+                        <input 
+                            type="tel" 
+                            class="form-control" 
+                            id="telefone" 
+                            name="telefone"
+                            placeholder="(84) 99999-9999"
+                            required
+                            minlength="10"
+                            oninput="formatarTelefone(this)"
+                        >
+                        <small class="text-muted">Mínimo 10 dígitos</small>
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="bi bi-envelope"></i> Email
+                        </label>
+                        <input 
+                            type="email" 
+                            class="form-control" 
+                            id="email" 
+                            name="email"
+                            placeholder="exemplo@email.com"
+                        >
+                        <small class="text-muted">Opcional</small>
+                    </div>
+
+                    <!-- ENDEREÇO -->
+                    <div class="mb-3">
+                        <label for="endereco" class="form-label">
+                            <i class="bi bi-geo-alt"></i> Endereço
+                        </label>
+                        <textarea 
+                            class="form-control" 
+                            id="endereco" 
+                            name="endereco"
+                            rows="3"
+                            placeholder="Rua, número, bairro, cidade..."
+                        ></textarea>
+                        <small class="text-muted">Opcional</small>
+                    </div>
+
+                    <!-- OBSERVAÇÃO -->
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Campos obrigatórios:</strong> Nome e Telefone
+                    </div>
+
+                    <!-- BOTÕES -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Cadastrar Cliente
+                        </button>
+                    </div>
+                </form>
+
+                <div id="loadingIndicator" class="loading">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Processando...</span>
+                    </div>
+                    <p>Cadastrando cliente...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('formCadastroCliente').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // Validação básica
+        const nome = document.getElementById('nome').value.trim();
+        const telefone = document.getElementById('telefone').value.trim();
+
+        if (!nome || nome.length < 3) {
+            mostrarErro('❌ Nome deve ter no mínimo 3 caracteres!');
+            return;
+        }
+
+        if (!telefone || telefone.replace(/\D/g, '').length < 10) {
+            mostrarErro('❌ Telefone deve ter no mínimo 10 dígitos!');
+            return;
+        }
+
+        // Mostrar loading
+        document.getElementById('loadingIndicator').style.display = 'block';
+
+        try {
+            const response = await fetch('/cadastro-cliente', {
+                method: 'POST',
+                body: new FormData(this)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                mostrarSucesso(data.mensagem);
+                document.getElementById('formCadastroCliente').reset();
+                
+                // Redirecionar para consulta após 2 segundos
+                setTimeout(() => {
+                    window.location.href = '/consulta-cliente';
+                }, 2000);
+            } else {
+                mostrarErro(data.mensagem);
+            }
+        } catch (error) {
+            mostrarErro('❌ Erro ao cadastrar cliente: ' + error.message);
+        } finally {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

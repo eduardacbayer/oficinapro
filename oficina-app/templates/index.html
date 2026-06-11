@@ -3,65 +3,106 @@
 {% block title %}Home - Sistema Oficina{% endblock %}
 
 {% block content %}
-<!-- HERO SECTION -->
 <div class="hero mb-5">
     <h1><i class="bi bi-tools"></i> Bem-vindo ao Sistema de Gestão</h1>
     <p>Gerenciador de Clientes e Veículos para Oficina Automobilística</p>
     <p class="text-light">Organize seus clientes e controle o histórico de seus veículos</p>
 </div>
 
-<!-- MENU PRINCIPAL -->
 <div class="row mb-5">
-    <!-- CADASTRO DE CLIENTE -->
     <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card-menu">
-            <i class="bi bi-person-plus"></i>
-            <h5>Cadastrar Cliente</h5>
-            <p class="text-muted">Registre um novo cliente no sistema</p>
-            <a href="/cadastro-cliente" class="btn btn-primary btn-sm">
-                <i class="bi bi-arrow-right"></i> Acessar
-            </a>
+        <div class="card-menu text-center p-4 d-flex flex-column justify-content-between h-100" style="background: #ffffff; border-radius: 12px; border: 1px solid #eef2f3; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s;">
+            <div>
+                <i class="bi bi-person-plus" style="font-size: 2rem; color: #2c3e50;"></i>
+                <h5 class="mt-3" style="font-weight: 600; color: #222222;">Cadastrar Cliente</h5>
+                <p class="text-muted small mb-4">Registre um novo cliente no sistema</p>
+            </div>
+            <div class="d-flex justify-content-center w-100">
+                <a href="/cadastro-cliente" class="btn-oficina">
+                    Acessar
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- CONSULTAR CLIENTE -->
     <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card-menu">
-            <i class="bi bi-search"></i>
-            <h5>Consultar Cliente</h5>
-            <p class="text-muted">Busque clientes cadastrados</p>
-            <a href="/consulta-cliente" class="btn btn-primary btn-sm">
-                <i class="bi bi-arrow-right"></i> Acessar
-            </a>
+        <div class="card-menu text-center p-4 d-flex flex-column justify-content-between h-100" style="background: #ffffff; border-radius: 12px; border: 1px solid #eef2f3; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s;">
+            <div>
+                <i class="bi bi-search" style="font-size: 2rem; color: #2c3e50;"></i>
+                <h5 class="mt-3" style="font-weight: 600; color: #222222;">Consultar Cliente</h5>
+                <p class="text-muted small mb-4">Busque clientes cadastrados</p>
+            </div>
+            <div class="d-flex justify-content-center w-100">
+                <a href="/consulta-cliente" class="btn-oficina">
+                    Acessar
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- CADASTRO DE VEÍCULO -->
     <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card-menu">
-            <i class="bi bi-car-front-fill"></i>
-            <h5>Cadastrar Veículo</h5>
-            <p class="text-muted">Registre um novo veículo no sistema</p>
-            <a href="/cadastro-veiculo" class="btn btn-primary btn-sm">
-                <i class="bi bi-arrow-right"></i> Acessar
-            </a>
+        <div class="card-menu text-center p-4 d-flex flex-column justify-content-between h-100" style="background: #ffffff; border-radius: 12px; border: 1px solid #eef2f3; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s;">
+            <div>
+                <i class="bi bi-car-front-fill" style="font-size: 2rem; color: #2c3e50;"></i>
+                <h5 class="mt-3" style="font-weight: 600; color: #222222;">Cadastrar Veículo</h5>
+                <p class="text-muted small mb-4">Registre um novo veículo no sistema</p>
+            </div>
+            <div class="d-flex justify-content-center w-100">
+                <a href="/cadastro-veiculo" class="btn-oficina">
+                    Acessar
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- CONSULTAR VEÍCULO -->
     <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card-menu">
-            <i class="bi bi-search"></i>
-            <h5>Consultar Veículo</h5>
-            <p class="text-muted">Busque veículos cadastrados</p>
-            <a href="/consulta-veiculo" class="btn btn-primary btn-sm">
-                <i class="bi bi-arrow-right"></i> Acessar
-            </a>
+        <div class="card-menu text-center p-4 d-flex flex-column justify-content-between h-100" style="background: #ffffff; border-radius: 12px; border: 1px solid #eef2f3; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s;">
+            <div>
+                <i class="bi bi-search" style="font-size: 2rem; color: #2c3e50;"></i>
+                <h5 class="mt-3" style="font-weight: 600; color: #222222;">Consultar Veículo</h5>
+                <p class="text-muted small mb-4">Busque veículos cadastrados</p>
+            </div>
+            <div class="d-flex justify-content-center w-100">
+                <a href="/consulta-veiculo" class="btn-oficina">
+                    Acessar
+                </a>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- INFORMAÇÕES -->
+<style>
+    .btn-oficina {
+        display: inline-block;
+        width: 130px; /* Largura compacta e fixa para o botão */
+        padding: 8px 0; /* Espaçamento interno menor e proporcional */
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #ffffff !important;
+        background-color: #2c3e50; /* Sua cor escura padrão mantida */
+        border: none;
+        border-radius: 6px; /* Cantos arredondados elegantes */
+        text-decoration: none;
+        text-align: center;
+        box-shadow: 0 3px 6px rgba(44, 62, 80, 0.12); /* Sombra suave */
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-oficina:hover {
+        background-color: #1a252f; /* Feedback sutil ao passar o mouse */
+        box-shadow: 0 5px 12px rgba(44, 62, 80, 0.22); /* Sombra ganha um leve destaque */
+        transform: translateY(-1.5px); /* Efeito flutuante minimalista */
+    }
+    
+    .card-menu {
+        min-height: 240px;
+    }
+    .card-menu:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 18px rgba(0,0,0,0.05) !important;
+    }
+</style>
+
 <div class="row">
     <div class="col-lg-8 mx-auto">
         <div class="card">

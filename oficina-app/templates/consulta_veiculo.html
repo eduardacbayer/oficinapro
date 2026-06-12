@@ -3,52 +3,60 @@
 {% block title %}Consultar Veículo{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-10 mx-auto">
-        <!-- CABEÇALHO -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="bi bi-search"></i> Consultar Veículo</h5>
+<div class="row mt-4">
+    <div class="col-lg-10 mx-auto mb-5">
+        
+        <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 16px; background: #ffffff;">
+            <div class="d-flex align-items-center mb-3">
+                <div class="icon-search-box me-3">
+                    <i class="bi bi-search"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0" style="font-weight: 700; color: #1e293b;">Consultar Veículos</h5>
+                    <p class="text-muted small mb-0">Pesquise os veículos registrados na base de dados da oficina</p>
+                </div>
             </div>
-            <div class="card-body">
+            
+            <div class="card-body px-0 pb-0">
                 <form method="POST" class="row g-3">
                     <div class="col-md-9">
                         <input 
                             type="text" 
-                            class="form-control form-control-lg" 
+                            class="form-control form-control-custom-lg" 
                             name="busca"
                             placeholder="Buscar por placa, marca, modelo ou cliente..."
-                            value="{{ termo_busca }}"
+                            value="{{ termo_busca if termo_busca else '' }}"
                         >
                     </div>
                     <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary btn-lg w-100">
-                            <i class="bi bi-search"></i> Buscar
+                        <button type="submit" class="btn-busca-custom w-100">
+                            <i class="bi bi-search me-1"></i> Buscar
                         </button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- RESULTADOS -->
         {% if veiculos %}
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h6 class="mb-0">
-                        <i class="bi bi-check-circle"></i> 
-                        {{ veiculos|length }} veículo(s) encontrado(s)
-                    </h6>
+            <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 16px; background: #ffffff;">
+                <div class="px-4 py-3 d-flex justify-content-between align-items-center" style="background-color: #f8fafc; border-bottom: 1px solid #f1f5f9;">
+                    <span class="small text-muted font-weight-600">
+                        <i class="bi bi-layers-half me-1"></i> Frota de Veículos
+                    </span>
+                    <span class="badge rounded-pill px-3 py-2 text-success" style="background-color: rgba(46, 204, 113, 0.1); font-weight: 600;">
+                        <i class="bi bi-check2-circle me-1"></i> {{ veiculos|length }} encontrado(s)
+                    </span>
                 </div>
+                
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
+                    <table class="table table-custom mb-0">
                         <thead>
                             <tr>
-                                <th><i class="bi bi-tag"></i> Placa</th>
-                                <th><i class="bi bi-car-front"></i> Marca</th>
-                                <th>Modelo</th>
-                                <th><i class="bi bi-calendar"></i> Ano</th>
-                                <th><i class="bi bi-palette"></i> Cor</th>
-                                <th><i class="bi bi-person"></i> Cliente</th>
+                                <th><i class="bi bi-tag me-1"></i> Placa</th>
+                                <th><i class="bi bi-car-front me-1"></i> Veículo</th>
+                                <th><i class="bi bi-calendar me-1"></i> Ano</th>
+                                <th><i class="bi bi-palette me-1"></i> Cor</th>
+                                <th><i class="bi bi-person me-1"></i> Proprietário</th>
                                 <th style="text-align: center;">Ações</th>
                             </tr>
                         </thead>
@@ -56,34 +64,32 @@
                             {% for veiculo in veiculos %}
                             <tr>
                                 <td>
-                                    <strong>
-                                        <span class="badge bg-dark">{{ veiculo['placa'] }}</span>
-                                    </strong>
+                                    <span class="badge-placa-custom">{{ veiculo['placa'] }}</span>
                                 </td>
-                                <td>{{ veiculo['marca'] }}</td>
-                                <td>{{ veiculo['modelo'] }}</td>
                                 <td>
+                                    <span class="veiculo-nome-destaque">{{ veiculo['marca'] }}</span>
+                                    <div class="text-muted small">{{ veiculo['modelo'] }}</div>
+                                </td>
+                                <td class="text-muted">
                                     {% if veiculo['ano'] %}
                                         {{ veiculo['ano'] }}
                                     {% else %}
                                         <span class="text-muted">-</span>
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td class="text-muted">
                                     {% if veiculo['cor'] %}
                                         {{ veiculo['cor'] }}
                                     {% else %}
                                         <span class="text-muted">-</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ veiculo['cliente_nome'] }}</td>
+                                <td>
+                                    <span class="text-secondary font-weight-600">{{ veiculo['cliente_nome'] }}</span>
+                                </td>
                                 <td style="text-align: center;">
-                                    <a 
-                                        href="/cliente/{{ veiculo['cliente_id'] }}" 
-                                        class="btn btn-info btn-sm"
-                                        title="Ver cliente"
-                                    >
-                                        <i class="bi bi-person"></i> Cliente
+                                    <a href="/cliente/{{ veiculo['cliente_id'] }}" class="btn-action-view">
+                                        <i class="bi bi-person-fill me-1"></i> Cliente
                                     </a>
                                 </td>
                             </tr>
@@ -93,52 +99,211 @@
                 </div>
             </div>
 
-            <!-- AÇÕES -->
             <div class="mt-4 text-center">
-                <a href="/cadastro-veiculo" class="btn btn-primary">
-                    <i class="bi bi-car-front-fill"></i> Cadastrar Novo Veículo
+                <a href="/cadastro-veiculo" class="btn-link-secundario">
+                    <i class="bi bi-car-front-fill me-1"></i> Cadastrar Outro Veículo
                 </a>
             </div>
 
         {% elif termo_busca %}
-            <!-- NENHUM RESULTADO -->
-            <div class="alert alert-warning" role="alert">
-                <i class="bi bi-exclamation-triangle"></i>
-                <strong>Nenhum veículo encontrado</strong>
-                <p>Sua busca por "<strong>{{ termo_busca }}</strong>" não retornou resultados.</p>
-                <small>Tente buscar por placa, marca, modelo ou nome do cliente.</small>
-            </div>
-
-            <div class="text-center">
-                <a href="/consulta-veiculo" class="btn btn-secondary me-2">
-                    <i class="bi bi-arrow-clockwise"></i> Limpar Busca
-                </a>
-                <a href="/cadastro-veiculo" class="btn btn-primary">
-                    <i class="bi bi-car-front-fill"></i> Cadastrar Veículo
-                </a>
+            <div class="card border-0 shadow-sm text-center p-5" style="border-radius: 16px; background: #ffffff;">
+                <div class="icon-state-wrapper mb-3 text-warning mx-auto">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <h5 style="font-weight: 700; color: #1e293b;">Nenhum veículo encontrado</h5>
+                <p class="text-muted mx-auto mb-4" style="max-width: 420px; font-size: 0.9rem;">
+                    A sua busca por "<strong>{{ termo_busca }}</strong>" não retornou nenhum registro de veículo correspondente no sistema.
+                </p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="/consulta-veiculo" class="btn-cancelar-custom text-decoration-none">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Limpar Filtro
+                    </a>
+                    <a href="/cadastro-veiculo" class="btn-busca-custom px-4 text-decoration-none d-inline-flex align-items-center">
+                        <i class="bi bi-car-front me-1"></i> Novo Cadastro
+                    </a>
+                </div>
             </div>
 
         {% else %}
-            <!-- INÍCIO -->
-            <div class="alert alert-info" role="alert">
-                <i class="bi bi-info-circle"></i>
-                <strong>Bem-vindo!</strong>
-                <p>Use o campo acima para buscar veículos cadastrados no sistema.</p>
-                <p>Você pode buscar por:</p>
-                <ul class="mb-0">
-                    <li>Placa do veículo (ex: ABC1234)</li>
-                    <li>Marca (ex: Volkswagen)</li>
-                    <li>Modelo (ex: Gol)</li>
-                    <li>Nome do cliente proprietário</li>
-                </ul>
-            </div>
-
-            <div class="text-center">
-                <a href="/cadastro-veiculo" class="btn btn-primary btn-lg">
-                    <i class="bi bi-car-front-fill"></i> Cadastrar Novo Veículo
-                </a>
+            <div class="card border-0 shadow-sm text-center p-5" style="border-radius: 16px; background: #ffffff;">
+                <div class="icon-state-wrapper mb-3 text-muted mx-auto" style="color: #64748b !important;">
+                    <i class="bi bi-keyboard"></i>
+                </div>
+                <h5 style="font-weight: 700; color: #1e293b;">Pronto para pesquisar</h5>
+                <p class="text-muted mx-auto mb-4" style="max-width: 460px; font-size: 0.9rem;">
+                    Insira a placa, marca, modelo ou o nome do proprietário no campo superior para filtrar e gerenciar a frota de veículos da oficina.
+                </p>
+                <div class="text-center">
+                    <a href="/cadastro-veiculo" class="btn-busca-custom px-4 text-decoration-none d-inline-flex align-items-center">
+                        <i class="bi bi-car-front me-1"></i> Cadastrar Novo Veículo
+                    </a>
+                </div>
             </div>
         {% endif %}
     </div>
 </div>
+
+<style>
+    body {
+        background-color: #f4f6f9 !important;
+    }
+
+    /* Caixa do ícone superior */
+    .icon-search-box {
+        width: 42px;
+        height: 42px;
+        background-color: #f1f5f9;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #2c3e50;
+        font-size: 1.15rem;
+    }
+
+    /* Input grande de busca */
+    .form-control-custom-lg {
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        color: #1e293b;
+        transition: all 0.2s ease-in-out;
+    }
+    .form-control-custom-lg:focus {
+        border-color: #2c3e50;
+        box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.12);
+    }
+
+    /* Botão Principal de Busca */
+    .btn-busca-custom {
+        padding: 12px 0;
+        font-size: 0.92rem;
+        font-weight: 600;
+        color: #ffffff;
+        background-color: #2c3e50;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(44, 62, 80, 0.15);
+        transition: all 0.2s ease-in-out;
+        display: block;
+        text-align: center;
+    }
+    .btn-busca-custom:hover {
+        background-color: #1a252f;
+        color: #ffffff;
+        box-shadow: 0 6px 12px rgba(44, 62, 80, 0.25);
+    }
+
+    /* Customização da Tabela de Dados */
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .table-custom thead th {
+        background-color: #f8fafc;
+        padding: 14px 20px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .table-custom tbody tr td {
+        padding: 14px 20px;
+        font-size: 0.9rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .table-custom tbody tr {
+        transition: background-color 0.15s;
+    }
+    .table-custom tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    .veiculo-nome-destaque {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    /* Badge Customizada para Placa de Carro */
+    .badge-placa-custom {
+        background-color: #1e293b;
+        color: #ffffff;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-family: 'monospace', sans-serif;
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+        border: 1px solid #334155;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+
+    /* Botão de Ação "Visualizar Cliente" */
+    .btn-action-view {
+        padding: 6px 14px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #2c3e50;
+        background-color: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .btn-action-view:hover {
+        background-color: #2c3e50;
+        color: #ffffff;
+        border-color: #2c3e50;
+    }
+
+    /* Caixa de estado vazio (Empty States) */
+    .icon-state-wrapper {
+        width: 64px;
+        height: 64px;
+        background-color: #f8fafc;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+    }
+
+    /* Botão de Cancelar / Voltar */
+    .btn-cancelar-custom {
+        padding: 10px 18px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #64748b;
+        background-color: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        transition: all 0.2s;
+    }
+    .btn-cancelar-custom:hover {
+        background-color: #e2e8f0;
+        color: #334155;
+    }
+
+    /* Links secundários de rodapé */
+    .btn-link-secundario {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #2c3e50;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .btn-link-secundario:hover {
+        color: #1a252f;
+        text-decoration: underline;
+    }
+    
+    .font-weight-600 {
+        font-weight: 600;
+    }
+</style>
 {% endblock %}

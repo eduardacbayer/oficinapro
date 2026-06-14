@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}{{ cliente['nome'] }} - Detalhes{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <!-- CARD CLIENTE -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="mb-0"><i class="bi bi-person"></i> {{ cliente['nome'] }}</h5>
+                    </div>
+                    <div class="col-auto">
+                        <a href="/consulta-cliente" class="btn btn-light btn-sm">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong><i class="bi bi-telephone"></i> Telefone:</strong><br>{{ cliente['telefone'] }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>
+                            <strong><i class="bi bi-envelope"></i> Email:</strong><br>
+                            {% if cliente['email'] %}
+                                {{ cliente['email'] }}
+                            {% else %}
+                                <span class="text-muted">Não informado</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>
+                            <strong><i class="bi bi-geo-alt"></i> Endereço:</strong><br>
+                            {% if cliente['endereco'] %}
+                                {{ cliente['endereco'] }}
+                            {% else %}
+                                <span class="text-muted">Não informado</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>
+                            <strong><i class="bi bi-calendar"></i> Data Cadastro:</strong><br>
+                            {{ cliente['data_cadastro'][:10] }} às {{ cliente['data_cadastro'][11:16] }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VEÍCULOS -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="mb-0">
+                            <i class="bi bi-car-front"></i> 
+                            Veículos ({{ veiculos|length }})
+                        </h5>
+                    </div>
+                    <div class="col-auto">
+                        <a href="/cadastro-veiculo" class="btn btn-light btn-sm">
+                            <i class="bi bi-car-front-fill"></i> Cadastrar Novo Veículo
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if veiculos %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th><i class="bi bi-tag"></i> Placa</th>
+                                    <th><i class="bi bi-car-front"></i> Marca</th>
+                                    <th>Modelo</th>
+                                    <th><i class="bi bi-calendar3"></i> Ano</th>
+                                    <th><i class="bi bi-palette"></i> Cor</th>
+                                    <th>Cadastrado em</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for veiculo in veiculos %}
+                                <tr>
+                                    <td>
+                                        <strong>
+                                            <span class="badge bg-dark">{{ veiculo['placa'] }}</span>
+                                        </strong>
+                                    </td>
+                                    <td>{{ veiculo['marca'] }}</td>
+                                    <td>{{ veiculo['modelo'] }}</td>
+                                    <td>
+                                        {% if veiculo['ano'] %}
+                                            {{ veiculo['ano'] }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if veiculo['cor'] %}
+                                            {{ veiculo['cor'] }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ veiculo['data_cadastro'][:10] }}</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Nenhum veículo cadastrado</strong>
+                        <p>Este cliente não possui veículos registrados no sistema.</p>
+                    </div>
+                    <a href="/cadastro-veiculo" class="btn btn-primary">
+                        <i class="bi bi-car-front-fill"></i> Cadastrar Primeiro Veículo
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- AÇÕES -->
+        <div class="mt-4 text-center">
+            <a href="/" class="btn btn-secondary">
+                <i class="bi bi-house"></i> Voltar ao Início
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

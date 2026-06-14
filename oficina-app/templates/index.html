@@ -3,17 +3,14 @@
 {% block title %}Home - Sistema Oficina{% endblock %}
 
 {% block content %}
-<!-- HERO SECTION -->
 <div class="hero mb-5">
     <h1><i class="bi bi-tools"></i> Bem-vindo ao Sistema de Gestão</h1>
-    <p>Gerenciador de Clientes e Veículos para Oficina Automobilística</p>
-    <p class="text-light">Organize seus clientes e controle o histórico de seus veículos</p>
+    <p>Gerenciador de Clientes, Veículos e Agendamentos para Oficina Automobilística</p>
+    <p class="text-light">Organize seus clientes, controle a frota e gerencie o fluxo de atendimento</p>
 </div>
 
-<!-- MENU PRINCIPAL -->
 <div class="row mb-5">
-    <!-- CADASTRO DE CLIENTE -->
-    <div class="col-md-6 col-lg-3 mb-4">
+    <div class="col-md-6 col-lg-4 mb-4">
         <div class="card-menu">
             <i class="bi bi-person-plus"></i>
             <h5>Cadastrar Cliente</h5>
@@ -24,20 +21,7 @@
         </div>
     </div>
 
-    <!-- CONSULTAR CLIENTE -->
-    <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card-menu">
-            <i class="bi bi-search"></i>
-            <h5>Consultar Cliente</h5>
-            <p class="text-muted">Busque clientes cadastrados</p>
-            <a href="/consulta-cliente" class="btn btn-primary btn-sm">
-                <i class="bi bi-arrow-right"></i> Acessar
-            </a>
-        </div>
-    </div>
-
-    <!-- CADASTRO DE VEÍCULO -->
-    <div class="col-md-6 col-lg-3 mb-4">
+    <div class="col-md-6 col-lg-4 mb-4">
         <div class="card-menu">
             <i class="bi bi-car-front-fill"></i>
             <h5>Cadastrar Veículo</h5>
@@ -48,8 +32,29 @@
         </div>
     </div>
 
-    <!-- CONSULTAR VEÍCULO -->
-    <div class="col-md-6 col-lg-3 mb-4">
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card-menu">
+            <i class="bi bi-calendar-plus"></i>
+            <h5>Novo Agendamento</h5>
+            <p class="text-muted">Agende um serviço para a oficina</p>
+            <a href="/agendar" class="btn btn-primary btn-sm">
+                <i class="bi bi-arrow-right"></i> Acessar
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card-menu">
+            <i class="bi bi-search"></i>
+            <h5>Consultar Cliente</h5>
+            <p class="text-muted">Busque clientes cadastrados</p>
+            <a href="/consulta-cliente" class="btn btn-primary btn-sm">
+                <i class="bi bi-arrow-right"></i> Acessar
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
         <div class="card-menu">
             <i class="bi bi-search"></i>
             <h5>Consultar Veículo</h5>
@@ -59,23 +64,32 @@
             </a>
         </div>
     </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card-menu">
+            <i class="bi bi-calendar-check"></i>
+            <h5>Agenda da Oficina</h5>
+            <p class="text-muted">Gerencie todos os atendimentos</p>
+            <a href="/agendamentos" class="btn btn-primary btn-sm">
+                <i class="bi bi-arrow-right"></i> Acessar
+            </a>
+        </div>
+    </div>
 </div>
 
-<!-- INFORMAÇÕES -->
 <div class="row">
     <div class="col-lg-8 mx-auto">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title"><i class="bi bi-info-circle"></i> Sobre Este Sistema</h5>
                 <p class="card-text">
-                    Este sistema foi desenvolvido para facilitar o gerenciamento de clientes e veículos 
-                    em uma oficina automobilística. Com ele você pode:
+                    Este sistema foi desenvolvido para facilitar o gerenciamento completo de uma oficina automobilística. Com ele você pode:
                 </p>
                 <ul>
-                    <li><strong>Cadastrar e consultar clientes</strong> - Mantenha todos os dados organizados</li>
-                    <li><strong>Cadastrar veículos</strong> - Vincule veículos aos clientes</li>
-                    <li><strong>Buscar rapidamente</strong> - Encontre informações em segundos</li>
-                    <li><strong>Histórico completo</strong> - Acesso a todos os dados registrados</li>
+                    <li><strong>Cadastrar e consultar clientes</strong> - Mantenha todos os dados organizados.</li>
+                    <li><strong>Cadastrar veículos</strong> - Vincule veículos aos clientes.</li>
+                    <li><strong>Agendar atendimentos</strong> - Organize o fluxo da oficina evitando conflitos de horários.</li>
+                    <li><strong>Gerenciar agenda</strong> - Cancele ou altere agendamentos dinamicamente.</li>
                 </ul>
                 <hr>
                 <p class="text-muted small mb-0">

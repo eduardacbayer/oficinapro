@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Consulta de Agendamentos{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Agenda da Oficina</h5>
+                <a href="/agendar" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg"></i> Novo Agendamento
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Cliente</th>
+                                <th>Veículo</th>
+                                <th>Serviço</th>
+                                <th>Status</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in agendamentos %}
+                            <tr>
+                                <td>
+                                    <strong>{{ a.data_agendamento }}</strong><br>
+                                    <small class="text-muted">{{ a.hora_agendamento }}</small>
+                                </td>
+                                <td>{{ a.cliente_nome }}</td>
+                                <td>{{ a.marca }} {{ a.modelo }} ({{ a.placa }})</td>
+                                <td>{{ a.descricao or 'Nenhuma descrição' }}</td>
+                                <td>
+                                    {% if a.status == 'Agendado' %}
+                                        <span class="badge bg-success">{{ a.status }}</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">{{ a.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if a.status == 'Agendado' %}
+                                    <button class="btn btn-warning btn-sm" onclick="abrirModalEdicao('{{ a.id }}', '{{ a.data_agendamento }}', '{{ a.hora_agendamento }}')" title="Reagendar">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="cancelarAgendamento('{{ a.id }}')" title="Cancelar">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                                    {% else %}
+                                    <span class="text-muted"><i class="bi bi-slash-circle"></i></span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="bi bi-calendar-x fs-2"></i>
+                                    <p class="mt-2">Nenhum agendamento encontrado.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title"><i class="bi bi-clock-history"></i> Reagendar Atendimento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formEditarAgendamento">
+                <div class="modal-body">
+                    <input type="hidden" id="edit_id" name="id">
+                    <div class="mb-3">
+                        <label for="nova_data" class="form-label">Nova Data</label>
+                        <input type="date" class="form-control" id="nova_data" name="nova_data" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nova_hora" class="form-label">Novo Horário</label>
+                        <input type="time" class="form-control" id="nova_hora" name="nova_hora" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Inicializar Modal do Bootstrap
+    const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
+
+    // Abre o modal e preenche com os dados atuais
+    function abrirModalEdicao(id, data, hora) {
+        document.getElementById('edit_id').value = id;
+        document.getElementById('nova_data').value = data;
+        document.getElementById('nova_hora').value = hora;
+        modalEditar.show();
+    }
+
+    // Submeter formulário de edição
+    document.getElementById('formEditarAgendamento').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const id = document.getElementById('edit_id').value;
+        const formData = new FormData(this);
+
+        try {
+            const response = await fetch(`/agendamento/${id}/editar`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                mostrarSucesso(data.mensagem);
+                modalEditar.hide();
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                mostrarErro(data.mensagem);
+            }
+        } catch (error) {
+            mostrarErro('❌ Erro ao atualizar: ' + error.message);
+        }
+    });
+
+    // Função de Cancelamento
+    async function cancelarAgendamento(id) {
+        if (confirm("Tem certeza que deseja cancelar este agendamento?")) {
+            try {
+                const response = await fetch(`/agendamento/${id}/cancelar`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    mostrarSucesso(data.mensagem);
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    mostrarErro(data.mensagem);
+                }
+            } catch (error) {
+                mostrarErro('❌ Erro ao cancelar: ' + error.message);
+            }
+        }
+    }
+</script>
+{% endblock %}

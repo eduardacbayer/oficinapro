@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Agendamento{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-calendar-plus"></i> Registrar Novo Agendamento</h5>
+            </div>
+            <div class="card-body">
+                <form id="formCadastroAgendamento">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cliente_id" class="form-label">
+                                <i class="bi bi-person"></i> Cliente *
+                            </label>
+                            <select class="form-select" id="cliente_id" name="cliente_id" required>
+                                <option value="">Selecione um cliente...</option>
+                                {% for cliente in clientes %}
+                                    <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="veiculo_id" class="form-label">
+                                <i class="bi bi-car-front"></i> Veículo *
+                            </label>
+                            <select class="form-select" id="veiculo_id" name="veiculo_id" required disabled>
+                                <option value="">Selecione o cliente primeiro...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="data" class="form-label">
+                                <i class="bi bi-calendar-event"></i> Data do Agendamento *
+                            </label>
+                            <input type="date" class="form-control" id="data" name="data" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="hora" class="form-label">
+                                <i class="bi bi-clock"></i> Horário *
+                            </label>
+                            <input type="time" class="form-control" id="hora" name="hora" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label">
+                            <i class="bi bi-card-text"></i> Descrição do Serviço
+                        </label>
+                        <textarea class="form-control" id="descricao" name="descricao" rows="3" placeholder="Ex: Revisão de 10.000km, Troca de óleo..."></textarea>
+                    </div>
+
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Campos obrigatórios:</strong> Cliente, Veículo, Data e Horário.
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Confirmar Agendamento
+                        </button>
+                    </div>
+                </form>
+
+                <div id="loadingIndicator" class="loading" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Processando...</span>
+                    </div>
+                    <p>Registrando agendamento...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Carregar veículos quando o cliente for selecionado
+    document.getElementById('cliente_id').addEventListener('change', async function() {
+        const clienteId = this.value;
+        const selectVeiculo = document.getElementById('veiculo_id');
+        
+        selectVeiculo.innerHTML = '<option value="">Carregando veículos...</option>';
+        selectVeiculo.disabled = true;
+
+        if (clienteId) {
+            try {
+                const response = await fetch(`/api/veiculos-cliente/${clienteId}`);
+                const veiculos = await response.json();
+                
+                selectVeiculo.innerHTML = '<option value="">Selecione um veículo...</option>';
+                
+                if (veiculos.length > 0) {
+                    veiculos.forEach(v => {
+                        let option = document.createElement('option');
+                        option.value = v.id;
+                        option.textContent = v.descricao;
+                        selectVeiculo.appendChild(option);
+                    });
+                    selectVeiculo.disabled = false;
+                } else {
+                    selectVeiculo.innerHTML = '<option value="">Nenhum veículo cadastrado para este cliente</option>';
+                }
+            } catch (error) {
+                mostrarErro('Erro ao buscar veículos.');
+                selectVeiculo.innerHTML = '<option value="">Erro ao carregar</option>';
+            }
+        } else {
+            selectVeiculo.innerHTML = '<option value="">Selecione o cliente primeiro...</option>';
+        }
+    });
+
+    // Envio do formulário
+    document.getElementById('formCadastroAgendamento').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        document.getElementById('loadingIndicator').style.display = 'block';
+
+        try {
+            const response = await fetch('/agendar', {
+                method: 'POST',
+                body: new FormData(this)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                mostrarSucesso(data.mensagem);
+                document.getElementById('formCadastroAgendamento').reset();
+                document.getElementById('veiculo_id').disabled = true;
+                document.getElementById('veiculo_id').innerHTML = '<option value="">Selecione o cliente primeiro...</option>';
+                
+                setTimeout(() => {
+                    window.location.href = '/agendamentos';
+                }, 2000);
+            } else {
+                mostrarErro(data.mensagem);
+            }
+        } catch (error) {
+            mostrarErro('❌ Erro ao registrar agendamento: ' + error.message);
+        } finally {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

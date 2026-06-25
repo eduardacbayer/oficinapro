@@ -63,6 +63,20 @@ def init_db():
             )
         """)
 
+        # Tabela Ordens de Serviço
+        cursor.execute("""
+            CREATE TABLE ordens_servico (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                agendamento_id INTEGER NOT NULL,
+                diagnostico TEXT,
+                servicos_executados TEXT,
+                status TEXT DEFAULT 'Aberta',
+                data_abertura TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                data_encerramento TIMESTAMP,
+                FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id)
+            )
+        """)
+        
         db.commit()
         db.close()
         print("✅ Banco de dados criado com sucesso!")
@@ -664,7 +678,25 @@ def api_veiculos_cliente(cliente_id):
         for v in veiculos
     ]
     return jsonify(lista_veiculos)
+    
+@app.route("/ordens-servico")
+def consulta_ordens():
+    db = get_db()
+    cursor = db.cursor()
 
+    cursor.execute("""
+        SELECT *
+        FROM ordens_servico
+        ORDER BY id DESC
+    """)
+
+    ordens = cursor.fetchall()
+    db.close()
+
+    return render_template(
+        "consulta_ordens.html",
+        ordens=ordens
+    )
 
 # ==================== ERROS ====================
 

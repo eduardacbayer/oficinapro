@@ -678,6 +678,57 @@ def api_veiculos_cliente(cliente_id):
         for v in veiculos
     ]
     return jsonify(lista_veiculos)
+
+@app.route("/ordem-servico/nova", methods=["GET", "POST"])
+def nova_ordem_servico():
+
+    db = get_db()
+    cursor = db.cursor()
+
+    if request.method == "POST":
+
+        agendamento_id = request.form.get("agendamento_id")
+        diagnostico = request.form.get("diagnostico")
+        servicos_executados = request.form.get("servicos_executados")
+
+        cursor.execute("""
+            INSERT INTO ordens_servico
+            (
+                agendamento_id,
+                diagnostico,
+                servicos_executados
+            )
+            VALUES (?, ?, ?)
+        """,
+        (
+            agendamento_id,
+            diagnostico,
+            servicos_executados
+        ))
+
+        db.commit()
+        db.close()
+
+        return redirect("/ordens-servico")
+
+    cursor.execute("""
+        SELECT
+            a.id,
+            c.nome
+        FROM agendamentos a
+        JOIN clientes c
+            ON a.cliente_id = c.id
+        WHERE a.status = 'Agendado'
+    """)
+
+    agendamentos = cursor.fetchall()
+
+    db.close()
+
+    return render_template(
+        "cadastro_ordem.html",
+        agendamentos=agendamentos
+    )
     
 @app.route("/ordens-servico")
 def consulta_ordens():
@@ -697,6 +748,38 @@ def consulta_ordens():
         "consulta_ordens.html",
         ordens=ordens
     )
+    
+@app.route("/abrir-os/<int:agendamento_id>", methods=["POST"])
+def abrir_ordem_servico(agendamento_id):
+
+    try:
+        db = get_db()
+        cursor = db.cursor()
+
+        cursor.execute("""
+            INSERT INTO ordens_servico (
+                agendamento_id,
+                status
+            )
+            VALUES (?, ?)
+        """, (
+            agendamento_id,
+            "Aberta"
+        ))
+
+        db.commit()
+        db.close()
+
+        return jsonify({
+            "sucesso": True,
+            "mensagem": "✅ Ordem de Serviço aberta com sucesso!"
+        })
+
+    except Exception as e:
+        return jsonify({
+            "sucesso": False,
+            "mensagem": f"❌ Erro: {str(e)}"
+        }), 500
 
 # ==================== ERROS ====================
 

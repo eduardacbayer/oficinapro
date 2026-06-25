@@ -681,23 +681,109 @@ def api_veiculos_cliente(cliente_id):
     
 @app.route("/ordens-servico")
 def consulta_ordens():
+
     db = get_db()
     cursor = db.cursor()
 
     cursor.execute("""
-        SELECT *
-        FROM ordens_servico
-        ORDER BY id DESC
+        SELECT
+            os.id,
+            os.diagnostico,
+            os.servicos_executados,
+            os.status,
+            os.data_abertura,
+
+            c.nome AS cliente_nome,
+
+            v.modelo,
+            v.placa
+
+        FROM ordens_servico os
+
+        JOIN agendamentos a
+            ON os.agendamento_id = a.id
+
+        JOIN clientes c
+            ON a.cliente_id = c.id
+
+        JOIN veiculos v
+            ON a.veiculo_id = v.id
+
+        ORDER BY os.id DESC
     """)
 
     ordens = cursor.fetchall()
+
     db.close()
 
     return render_template(
         "consulta_ordens.html",
         ordens=ordens
     )
+# ==================== ORDENS DE SERVIÇO ====================
 
+@app.route("/ordem-servico/nova", methods=["GET", "POST"])
+def cadastro_ordem():
+
+    db = get_db()
+    cursor = db.cursor()
+
+    if request.method == "POST":
+
+        try:
+            agendamento_id = request.form.get("agendamento_id")
+            diagnostico = request.form.get("diagnostico")
+
+            cursor.execute("""
+                INSERT INTO ordens_servico
+                (
+                    agendamento_id,
+                    diagnostico
+                )
+                VALUES (?, ?)
+            """,
+            (
+                agendamento_id,
+                diagnostico
+            ))
+
+            db.commit()
+            db.close()
+
+            return redirect(url_for("consulta_ordens"))
+
+        except Exception as e:
+
+            return jsonify(
+                {
+                    "sucesso": False,
+                    "mensagem": str(e)
+                }
+            )
+
+    cursor.execute("""
+        SELECT
+            a.id,
+            c.nome,
+            v.modelo,
+            v.placa
+        FROM agendamentos a
+        JOIN clientes c
+            ON a.cliente_id = c.id
+        JOIN veiculos v
+            ON a.veiculo_id = v.id
+        WHERE a.status = 'Agendado'
+        ORDER BY a.id DESC
+    """)
+
+    agendamentos = cursor.fetchall()
+
+    db.close()
+
+    return render_template(
+        "cadastro_ordem.html",
+        agendamentos=agendamentos
+    )
 # ==================== ERROS ====================
 
 

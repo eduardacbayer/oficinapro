@@ -3,101 +3,280 @@
 {% block title %}Home - Sistema Oficina{% endblock %}
 
 {% block content %}
-<div class="hero mb-5">
-    <h1><i class="bi bi-tools"></i> Bem-vindo ao Sistema de Gestão</h1>
-    <p>Gerenciador de Clientes, Veículos e Agendamentos para Oficina Automobilística</p>
-    <p class="text-light">Organize seus clientes, controle a frota e gerencie o fluxo de atendimento</p>
-</div>
-
-<div class="row mb-5">
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card-menu">
-            <i class="bi bi-person-plus"></i>
-            <h5>Cadastrar Cliente</h5>
-            <p class="text-muted">Registre um novo cliente no sistema</p>
-            <a href="/cadastro-cliente" class="btn btn-primary btn-sm">
-                <i class="bi bi-arrow-right"></i> Acessar
-            </a>
+<!-- HERO SECTION REFINADO (COM CORES FORTES E CANTOS ARREDONDADOS) -->
+<div class="container mt-4">
+    <div class="hero-moderno p-5 text-center text-white mb-5">
+        <div class="badge-operacional mb-3">
+            <span class="badge rounded-pill px-3 py-2"><i class="bi bi-gear-fill spin me-1"></i> Painel de Controle</span>
         </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card-menu">
-            <i class="bi bi-car-front-fill"></i>
-            <h5>Cadastrar Veículo</h5>
-            <p class="text-muted">Registre um novo veículo no sistema</p>
-            <a href="/cadastro-veiculo" class="btn btn-primary btn-sm">
-                <i class="bi bi-arrow-right"></i> Acessar
-            </a>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card-menu">
-            <i class="bi bi-calendar-plus"></i>
-            <h5>Novo Agendamento</h5>
-            <p class="text-muted">Agende um serviço para a oficina</p>
-            <a href="/agendar" class="btn btn-primary btn-sm">
-                <i class="bi bi-arrow-right"></i> Acessar
-            </a>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card-menu">
-            <i class="bi bi-search"></i>
-            <h5>Consultar Cliente</h5>
-            <p class="text-muted">Busque clientes cadastrados</p>
-            <a href="/consulta-cliente" class="btn btn-primary btn-sm">
-                <i class="bi bi-arrow-right"></i> Acessar
-            </a>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card-menu">
-            <i class="bi bi-search"></i>
-            <h5>Consultar Veículo</h5>
-            <p class="text-muted">Busque veículos cadastrados</p>
-            <a href="/consulta-veiculo" class="btn btn-primary btn-sm">
-                <i class="bi bi-arrow-right"></i> Acessar
-            </a>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card-menu">
-            <i class="bi bi-calendar-check"></i>
-            <h5>Agenda da Oficina</h5>
-            <p class="text-muted">Gerencie todos os atendimentos</p>
-            <a href="/agendamentos" class="btn btn-primary btn-sm">
-                <i class="bi bi-arrow-right"></i> Acessar
-            </a>
-        </div>
+        <h1 class="display-6" style="font-weight: 700; letter-spacing: -0.5px;">
+            Welcome to the Management System
+        </h1>
+        <p class="mx-auto mt-2 opacity-75" style="max-width: 600px; font-size: 1.05rem;">
+            Gerenciador de Clientes, Veículos e Agendamentos para Oficina Automobilística. Organize seus registros e controle históricos com eficiência.
+        </p>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-lg-8 mx-auto">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-info-circle"></i> Sobre Este Sistema</h5>
-                <p class="card-text">
-                    Este sistema foi desenvolvido para facilitar o gerenciamento completo de uma oficina automobilística. Com ele você pode:
-                </p>
-                <ul>
-                    <li><strong>Cadastrar e consultar clientes</strong> - Mantenha todos os dados organizados.</li>
-                    <li><strong>Cadastrar veículos</strong> - Vincule veículos aos clientes.</li>
-                    <li><strong>Agendar atendimentos</strong> - Organize o fluxo da oficina evitando conflitos de horários.</li>
-                    <li><strong>Gerenciar agenda</strong> - Cancele ou altere agendamentos dinamicamente.</li>
-                </ul>
-                <hr>
-                <p class="text-muted small mb-0">
-                    <i class="bi bi-clock"></i> Sistema versão 1.0 | 
-                    <i class="bi bi-lightning"></i> Desenvolvido para Sprint Final
-                </p>
+<!-- MENU PRINCIPAL EM CARDS EQUILIBRADOS (6 CARDS ADAPTADOS PARA O SEU GRID) -->
+<div class="row mb-5 justify-content-center">
+    <!-- CADASTRO DE CLIENTE -->
+    <div class="col-sm-6 col-md-6 col-lg-4 mb-4">
+        <div class="card-oficina-clean p-4 d-flex flex-column justify-content-between h-100">
+            <div class="text-center">
+                <div class="icon-circle mb-3 mx-auto">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+                <h5 class="card-title-oficina">Cadastrar Cliente</h5>
+                <p class="card-text-oficina">Registre novos perfis e dados de contato no banco.</p>
+            </div>
+            <div class="d-flex justify-content-center pt-2">
+                <a href="/cadastro-cliente" class="btn-oficina-fixed">Acessar</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- CADASTRO DE VEÍCULO -->
+    <div class="col-sm-6 col-md-6 col-lg-4 mb-4">
+        <div class="card-oficina-clean p-4 d-flex flex-column justify-content-between h-100">
+            <div class="text-center">
+                <div class="icon-circle mb-3 mx-auto">
+                    <i class="bi bi-car-front-fill"></i>
+                </div>
+                <h5 class="card-title-oficina">Cadastrar Veículo</h5>
+                <p class="card-text-oficina">Vincule modelos, placas e proprietários facilmente.</p>
+            </div>
+            <div class="d-flex justify-content-center pt-2">
+                <a href="/cadastro-veiculo" class="btn-oficina-fixed">Acessar</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVO AGENDAMENTO (ADICIONADO DO CÓDIGO DELA COM SEU ESTILO) -->
+    <div class="col-sm-6 col-md-6 col-lg-4 mb-4">
+        <div class="card-oficina-clean p-4 d-flex flex-column justify-content-between h-100">
+            <div class="text-center">
+                <div class="icon-circle mb-3 mx-auto">
+                    <i class="bi bi-calendar-plus"></i>
+                </div>
+                <h5 class="card-title-oficina">Novo Agendamento</h5>
+                <p class="card-text-oficina">Agende um novo serviço para os veículos da oficina.</p>
+            </div>
+            <div class="d-flex justify-content-center pt-2">
+                <a href="/agendar" class="btn-oficina-fixed">Acessar</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONSULTAR CLIENTE -->
+    <div class="col-sm-6 col-md-6 col-lg-4 mb-4">
+        <div class="card-oficina-clean p-4 d-flex flex-column justify-content-between h-100">
+            <div class="text-center">
+                <div class="icon-circle mb-3 mx-auto">
+                    <i class="bi bi-search"></i>
+                </div>
+                <h5 class="card-title-oficina">Consultar Cliente</h5>
+                <p class="card-text-oficina">Busque, edite e gerencie os clientes cadastrados.</p>
+            </div>
+            <div class="d-flex justify-content-center pt-2">
+                <a href="/consulta-cliente" class="btn-oficina-fixed">Acessar</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONSULTAR VEÍCULO -->
+    <div class="col-sm-6 col-md-6 col-lg-4 mb-4">
+        <div class="card-oficina-clean p-4 d-flex flex-column justify-content-between h-100">
+            <div class="text-center">
+                <div class="icon-circle mb-3 mx-auto">
+                    <i class="bi bi-search"></i>
+                </div>
+                <h5 class="card-title-oficina">Consultar Veículo</h5>
+                <p class="card-text-oficina">Acesse históricos completos e dados técnicos salvos.</p>
+            </div>
+            <div class="d-flex justify-content-center pt-2">
+                <a href="/consulta-veiculo" class="btn-oficina-fixed">Acessar</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- AGENDA DA OFICINA (ADICIONADO DO CÓDIGO DELA COM SEU ESTILO) -->
+    <div class="col-sm-6 col-md-6 col-lg-4 mb-4">
+        <div class="card-oficina-clean p-4 d-flex flex-column justify-content-between h-100">
+            <div class="text-center">
+                <div class="icon-circle mb-3 mx-auto">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <h5 class="card-title-oficina">Agenda da Oficina</h5>
+                <p class="card-text-oficina">Gerencie e controle todos os atendimentos marcados.</p>
+            </div>
+            <div class="d-flex justify-content-center pt-2">
+                <a href="/agendamentos" class="btn-oficina-fixed">Acessar</a>
             </div>
         </div>
     </div>
 </div>
+
+<!-- SEÇÃO SOBRE ESTE SISTEMA (RESTAURADA E MODERNIZADA) -->
+<div class="row mt-5">
+    <div class="col-lg-10 mx-auto">
+        <div class="card border-0 shadow-sm p-4" style="border-radius: 16px; background: #ffffff;">
+            <div class="card-body">
+                <h5 class="card-title mb-4" style="font-weight: 700; color: #1e293b;">
+                    <i class="bi bi-info-circle-fill text-muted me-2"></i>Sobre Este Sistema
+                </h5>
+                <p class="card-text text-muted mb-4" style="font-size: 0.95rem;">
+                    Este sistema foi desenvolvido para facilitar o gerenciamento centralizado de uma oficina automobilística, otimizando o fluxo de trabalho e o controle de dados.
+                </p>
+                
+                <!-- Recursos em Grid Minimalista -->
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-check-circle-fill text-success me-3 mt-1"></i>
+                            <div>
+                                <h6 class="mb-1" style="font-weight: 600; color: #334155;">Clientes Organizados</h6>
+                                <p class="text-muted small mb-0">Cadastre perfis e consulte informações completas em segundos.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-check-circle-fill text-success me-3 mt-1"></i>
+                            <div>
+                                <h6 class="mb-1" style="font-weight: 600; color: #334155;">Controle de Veículos</h6>
+                                <p class="text-muted small mb-0">Vincule históricos técnicos e modelos diretamente aos proprietários.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-check-circle-fill text-success me-3 mt-1"></i>
+                            <div>
+                                <h6 class="mb-1" style="font-weight: 600; color: #334155;">Agendamento de Serviços</h6>
+                                <p class="text-muted small mb-0">Organize o fluxo da oficina evitando conflitos de horários.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-check-circle-fill text-success me-3 mt-1"></i>
+                            <div>
+                                <h6 class="mb-1" style="font-weight: 600; color: #334155;">Gestão Avançada</h6>
+                                <p class="text-muted small mb-0">Cancele, altere e acompanhe a agenda da oficina dinamicamente.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-4" style="border-color: #f1f5f9;">
+                
+                <div class="d-flex justify-content-between align-items-center flex-wrap text-muted small">
+                    <div>
+                        <i class="bi bi-clock me-1"></i> Sistema versão 1.0
+                    </div>
+                    <div>
+                        <i class="bi bi-lightning-fill text-warning me-1"></i> Desenvolvido para Sprint Final
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ESTILOS DO DESIGN BALANCEADO -->
+<style>
+    body {
+        background-color: #f4f6f9 !important;
+    }
+
+    .hero-moderno {
+        background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+        border-radius: 16px;
+        box-shadow: 0 10px 20px rgba(44, 62, 80, 0.15);
+    }
+
+    .badge-operacional .badge {
+        background-color: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    .card-oficina-clean {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.01);
+        transition: all 0.25s ease-in-out;
+        min-height: 270px;
+    }
+
+    .card-oficina-clean:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(44, 62, 80, 0.08);
+        border-color: #cbd5e1;
+    }
+
+    .icon-circle {
+        width: 54px;
+        height: 54px;
+        background-color: #f8fafc;
+        border: 1px solid #f1f5f9;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #2c3e50;
+        font-size: 1.4rem;
+        transition: all 0.2s;
+    }
+
+    .card-oficina-clean:hover .icon-circle {
+        background-color: #2c3e50;
+        color: #ffffff;
+        transform: scale(1.05);
+    }
+
+    .card-title-oficina {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .card-text-oficina {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    .btn-oficina-fixed {
+        display: inline-block;
+        width: 120px;
+        padding: 7px 0;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #ffffff !important;
+        background-color: #2c3e50;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        text-align: center;
+        box-shadow: 0 3px 6px rgba(44, 62, 80, 0.15);
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-oficina-fixed:hover {
+        background-color: #1a252f;
+        box-shadow: 0 5px 12px rgba(44, 62, 80, 0.25);
+        transform: translateY(-1px);
+    }
+    
+    .spin {
+        animation: fa-spin 4s infinite linear;
+    }
+    @keyframes fa-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
 {% endblock %}

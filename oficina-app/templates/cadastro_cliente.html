@@ -3,39 +3,49 @@
 {% block title %}Cadastro de Cliente{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-6 mx-auto">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="bi bi-person-plus"></i> Cadastrar Novo Cliente</h5>
-            </div>
-            <div class="card-body">
+<div class="row mt-4">
+    <div class="col-lg-6 mx-auto mb-5">
+        <!-- CARD PRINCIPAL HARMONIZADO -->
+        <div class="card border-0 shadow-sm p-3" style="border-radius: 16px; background: #ffffff;">
+            
+            <!-- CABEÇALHO CLEAN -->
+            <div class="card-body pb-2">
+                <div class="d-flex align-items-center mb-4 pb-2 border-bottom" style="border-color: #f1f5f9 !important;">
+                    <div class="icon-header-box me-3">
+                        <i class="bi bi-person-plus-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0" style="font-weight: 700; color: #1e293b; letter-spacing: -0.5px;">Cadastrar Novo Cliente</h4>
+                        <p class="text-muted small mb-0">Insira os dados cadastrais no banco do sistema</p>
+                    </div>
+                </div>
+
                 <form id="formCadastroCliente">
                     <!-- NOME -->
                     <div class="mb-3">
-                        <label for="nome" class="form-label">
-                            <i class="bi bi-person"></i> Nome Completo *
+                        <label for="nome" class="form-label-custom">
+                            <i class="bi bi-person me-1"></i> Nome Completo <span class="text-danger">*</span>
                         </label>
                         <input 
                             type="text" 
-                            class="form-control" 
+                            class="form-control form-control-custom" 
                             id="nome" 
                             name="nome"
                             placeholder="Ex: João Silva"
                             required
                             minlength="3"
                         >
-                        <small class="text-muted">Mínimo 3 caracteres</small>
+                        <div class="form-text-info">Mínimo de 3 caracteres</div>
                     </div>
 
                     <!-- TELEFONE -->
                     <div class="mb-3">
-                        <label for="telefone" class="form-label">
-                            <i class="bi bi-telephone"></i> Telefone *
+                        <label for="telefone" class="form-label-custom">
+                            <i class="bi bi-telephone me-1"></i> Telefone <span class="text-danger">*</span>
                         </label>
                         <input 
                             type="tel" 
-                            class="form-control" 
+                            class="form-control form-control-custom" 
                             id="telefone" 
                             name="telefone"
                             placeholder="(84) 99999-9999"
@@ -43,66 +53,171 @@
                             minlength="10"
                             oninput="formatarTelefone(this)"
                         >
-                        <small class="text-muted">Mínimo 10 dígitos</small>
+                        <div class="form-text-info">Mínimo de 10 dígitos com DDD</div>
                     </div>
 
                     <!-- EMAIL -->
                     <div class="mb-3">
-                        <label for="email" class="form-label">
-                            <i class="bi bi-envelope"></i> Email
+                        <label for="email" class="form-label-custom">
+                            <i class="bi bi-envelope me-1"></i> E-mail <span class="text-muted font-normal">(Opcional)</span>
                         </label>
                         <input 
                             type="email" 
-                            class="form-control" 
+                            class="form-control form-control-custom" 
                             id="email" 
                             name="email"
                             placeholder="exemplo@email.com"
                         >
-                        <small class="text-muted">Opcional</small>
                     </div>
 
                     <!-- ENDEREÇO -->
-                    <div class="mb-3">
-                        <label for="endereco" class="form-label">
-                            <i class="bi bi-geo-alt"></i> Endereço
+                    <div class="mb-4">
+                        <label for="endereco" class="form-label-custom">
+                            <i class="bi bi-geo-alt me-1"></i> Endereço residencial <span class="text-muted font-normal">(Opcional)</span>
                         </label>
                         <textarea 
-                            class="form-control" 
+                            class="form-control form-control-custom" 
                             id="endereco" 
                             name="endereco"
                             rows="3"
                             placeholder="Rua, número, bairro, cidade..."
                         ></textarea>
-                        <small class="text-muted">Opcional</small>
                     </div>
 
-                    <!-- OBSERVAÇÃO -->
-                    <div class="alert alert-info" role="alert">
-                        <i class="bi bi-info-circle"></i> 
-                        <strong>Campos obrigatórios:</strong> Nome e Telefone
+                    <!-- AVISO DE OBRIGATORIEDADE DISCRETO -->
+                    <div class="d-flex align-items-center mb-4 p-3 style-alert-box">
+                        <i class="bi bi-info-circle-fill text-muted me-2" style="font-size: 1.1rem;"></i>
+                        <span class="small text-muted">Os campos marcados com um asterisco vermelho (<span class="text-danger">*</span>) são de preenchimento obrigatório.</span>
                     </div>
 
-                    <!-- BOTÕES -->
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="/" class="btn btn-secondary">
-                            <i class="bi bi-x-circle"></i> Cancelar
+                    <!-- AÇÕES / BOTÕES -->
+                    <div class="d-flex justify-content-end align-items-center gap-2 border-top pt-3" style="border-color: #f1f5f9 !important;">
+                        <a href="/" class="btn-cancelar-custom">
+                            Cancelar
                         </a>
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-check-circle"></i> Cadastrar Cliente
+                        <button type="submit" class="btn-salvar-custom">
+                            <i class="bi bi-check-lg me-1"></i> Salvar Cliente
                         </button>
                     </div>
                 </form>
 
-                <div id="loadingIndicator" class="loading">
-                    <div class="spinner-border" role="status">
+                <!-- INDICADOR DE LOADING MODERNO -->
+                <div id="loadingIndicator" class="loading-overlay text-center mt-3" style="display: none;">
+                    <div class="spinner-border text-dark spinner-border-sm" role="status">
                         <span class="visually-hidden">Processando...</span>
                     </div>
-                    <p>Cadastrando cliente...</p>
+                    <span class="small text-muted ms-2">Salvando registro...</span>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- FOLHA DE ESTILOS DA INTERFACE DE CADASTRO -->
+<style>
+    body {
+        background-color: #f4f6f9 !important;
+    }
+
+    /* Caixa container para o ícone do título */
+    .icon-header-box {
+        width: 44px;
+        height: 44px;
+        background-color: #f1f5f9;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #2c3e50;
+        font-size: 1.25rem;
+    }
+
+    /* Labels do formulário */
+    .form-label-custom {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 6px;
+    }
+    .font-normal {
+        font-weight: 400 !important;
+    }
+
+    /* Inputs elegantes com foco customizado */
+    .form-control-custom {
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 9px 12px;
+        font-size: 0.92rem;
+        color: #1e293b;
+        transition: all 0.2s ease-in-out;
+    }
+    .form-control-custom::placeholder {
+        color: #94a3b8;
+    }
+    .form-control-custom:focus {
+        background-color: #ffffff;
+        border-color: #2c3e50;
+        box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.12);
+        color: #1e293b;
+    }
+
+    /* Texto de apoio dos inputs */
+    .form-text-info {
+        font-size: 0.78rem;
+        color: #64748b;
+        margin-top: 4px;
+    }
+
+    /* Caixa de alerta integrada */
+    .style-alert-box {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+    }
+
+    /* Botão Salvar (Cor escura padrão do sistema) */
+    .btn-salvar-custom {
+        padding: 9px 20px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #ffffff;
+        background-color: #2c3e50;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(44, 62, 80, 0.15);
+        transition: all 0.2s ease-in-out;
+    }
+    .btn-salvar-custom:hover {
+        background-color: #1a252f;
+        box-shadow: 0 6px 12px rgba(44, 62, 80, 0.25);
+        transform: translateY(-1px);
+    }
+
+    /* Botão Cancelar Minimalista */
+    .btn-cancelar-custom {
+        padding: 9px 18px;
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: #64748b !important;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+    .btn-cancelar-custom:hover {
+        background-color: #f1f5f9;
+        color: #334155 !important;
+    }
+
+    /* Overlay do loading */
+    .loading-overlay {
+        padding: 8px;
+        background-color: #f8fafc;
+        border-radius: 8px;
+        border: 1px dashed #cbd5e1;
+    }
+</style>
 {% endblock %}
 
 {% block extra_js %}
@@ -110,7 +225,6 @@
     document.getElementById('formCadastroCliente').addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        // Validação básica
         const nome = document.getElementById('nome').value.trim();
         const telefone = document.getElementById('telefone').value.trim();
 
@@ -124,7 +238,7 @@
             return;
         }
 
-        // Mostrar loading
+        // Mostrar loading refinado
         document.getElementById('loadingIndicator').style.display = 'block';
 
         try {
@@ -139,7 +253,6 @@
                 mostrarSucesso(data.mensagem);
                 document.getElementById('formCadastroCliente').reset();
                 
-                // Redirecionar para consulta após 2 segundos
                 setTimeout(() => {
                     window.location.href = '/consulta-cliente';
                 }, 2000);

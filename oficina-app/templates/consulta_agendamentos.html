@@ -3,96 +3,117 @@
 {% block title %}Consulta de Agendamentos{% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="row mb-5">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Agenda da Oficina</h5>
-                <a href="/agendar" class="btn btn-primary btn-sm">
-                    <i class="bi bi-plus-lg"></i> Novo Agendamento
-                </a>
+        <!-- CONTAINER REFINADO -->
+        <div class="card-oficina-clean p-4">
+            
+            <!-- HEADER DA LISTAGEM -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-circle-sm">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="card-title-oficina mb-0" style="font-size: 1.3rem;">Agenda da Oficina</h4>
+                        <p class="card-text-oficina mb-0">Gerencie o fluxo de horários e status dos serviços.</p>
+                    </div>
+                </div>
+                <div>
+                    <a href="/agendar" class="btn-oficina-fixed py-2 px-3">
+                        <i class="bi bi-plus-lg me-1"></i> Novo Agendamento
+                    </a>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover table-striped align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Data/Hora</th>
-                                <th>Cliente</th>
-                                <th>Veículo</th>
-                                <th>Serviço</th>
-                                <th>Status</th>
-                                <th class="text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for a in agendamentos %}
-                            <tr>
-                                <td>
-                                    <strong>{{ a.data_agendamento }}</strong><br>
-                                    <small class="text-muted">{{ a.hora_agendamento }}</small>
-                                </td>
-                                <td>{{ a.cliente_nome }}</td>
-                                <td>{{ a.marca }} {{ a.modelo }} ({{ a.placa }})</td>
-                                <td>{{ a.descricao or 'Nenhuma descrição' }}</td>
-                                <td>
-                                    {% if a.status == 'Agendado' %}
-                                        <span class="badge bg-success">{{ a.status }}</span>
-                                    {% else %}
-                                        <span class="badge bg-danger">{{ a.status }}</span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">
-                                    {% if a.status == 'Agendado' %}
-                                    <button class="btn btn-warning btn-sm" onclick="abrirModalEdicao('{{ a.id }}', '{{ a.data_agendamento }}', '{{ a.hora_agendamento }}')" title="Reagendar">
+
+            <hr class="my-3" style="border-color: #f1f5f9;">
+
+            <!-- TABELA REESTILIZADA -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle custom-table-oficina">
+                    <thead>
+                        <tr>
+                            <th>Data / Hora</th>
+                            <th>Cliente</th>
+                            <th>Veículo</th>
+                            <th>Serviço</th>
+                            <th>Status</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in agendamentos %}
+                        <tr>
+                            <td style="min-width: 120px;">
+                                <strong class="text-slate-700" style="font-size: 0.92rem;">{{ a.data_agendamento }}</strong><br>
+                                <span class="text-muted small"><i class="bi bi-clock me-1"></i>{{ a.hora_agendamento }}</span>
+                            </td>
+                            <td class="fw-semibold text-slate-700">{{ a.cliente_nome }}</td>
+                            <td class="text-secondary small">{{ a.marca }} {{ a.modelo }} <span class="badge badge-placa">{{ a.placa }}</span></td>
+                            <td class="text-slate-600 text-truncate" style="max-width: 250px;">{{ a.descricao or 'Nenhuma descrição' }}</td>
+                            <td>
+                                {% if a.status == 'Agendado' %}
+                                    <span class="badge badge-status-success"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>{{ a.status }}</span>
+                                {% else %}
+                                    <span class="badge badge-status-danger"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>{{ a.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if a.status == 'Agendado' %}
+                                <div class="d-flex gap-1 justify-content-center">
+                                    <button class="btn-action-edit" onclick="abrirModalEdicao('{{ a.id }}', '{{ a.data_agendamento }}', '{{ a.hora_agendamento }}')" title="Reagendar">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" onclick="cancelarAgendamento('{{ a.id }}')" title="Cancelar">
-                                        <i class="bi bi-x-circle"></i>
+                                    <button class="btn-action-cancel" onclick="cancelarAgendamento('{{ a.id }}')" title="Cancelar">
+                                        <i class="bi bi-trash"></i>
                                     </button>
-                                    {% else %}
-                                    <span class="text-muted"><i class="bi bi-slash-circle"></i></span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="6" class="text-center text-muted py-4">
-                                    <i class="bi bi-calendar-x fs-2"></i>
-                                    <p class="mt-2">Nenhum agendamento encontrado.</p>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                                </div>
+                                {% else %}
+                                <span class="text-muted small"><i class="bi bi-dash-circle"></i> Finalizado</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <i class="bi bi-calendar-x text-muted mb-2" style="font-size: 2.5rem;"></i>
+                                <p class="mt-2 mb-0" style="font-size: 0.95rem;">Nenhum agendamento encontrado na base.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
+<!-- MODAL TOTALMENTE CUSTOMIZADO -->
 <div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-warning">
-                <h5 class="modal-title"><i class="bi bi-clock-history"></i> Reagendar Atendimento</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-modal-oficina">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-clock-history text-slate-700" style="font-size: 1.2rem;"></i>
+                    <h5 class="modal-title fw-bold text-slate-700" style="font-size: 1.1rem;">Reagendar Atendimento</h5>
+                </div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="formEditarAgendamento">
-                <div class="modal-body">
+                <div class="modal-body py-4">
                     <input type="hidden" id="edit_id" name="id">
                     <div class="mb-3">
-                        <label for="nova_data" class="form-label">Nova Data</label>
-                        <input type="date" class="form-control" id="nova_data" name="nova_data" required>
+                        <label for="nova_data" class="form-label text-muted small fw-bold">NOVA DATA</label>
+                        <input type="date" class="form-control custom-input-oficina" id="nova_data" name="nova_data" required>
                     </div>
                     <div class="mb-3">
-                        <label for="nova_hora" class="form-label">Novo Horário</label>
-                        <input type="time" class="form-control" id="nova_hora" name="nova_hora" required>
+                        <label for="nova_hora" class="form-label text-muted small fw-bold">NOVO HORÁRIO</label>
+                        <input type="time" class="form-control custom-input-oficina" id="nova_hora" name="nova_hora" required>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn-oficina-secondary py-2" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn-oficina-fixed py-2">Salvar Alterações</button>
                 </div>
             </form>
         </div>
@@ -101,11 +122,165 @@
 {% endblock %}
 
 {% block extra_js %}
+<style>
+    body {
+        background-color: #f4f6f9 !important;
+    }
+
+    .card-oficina-clean {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    }
+
+    .icon-circle-sm {
+        width: 44px;
+        height: 44px;
+        background-color: #2c3e50;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-size: 1.2rem;
+    }
+
+    .card-title-oficina {
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .card-text-oficina {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    /* ESTILIZAÇÃO DA TABELA */
+    .custom-table-oficina thead th {
+        background-color: #f8fafc;
+        color: #64748b;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        padding: 14px;
+        border-bottom: 2px solid #edf2f7;
+    }
+
+    .custom-table-oficina tbody td {
+        padding: 14px;
+        color: #334155;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .text-slate-700 { color: #334155; }
+    .text-slate-600 { color: #475569; }
+
+    /* BADGES CUSTOMIZADOS */
+    .badge-placa {
+        background-color: #f1f5f9;
+        color: #475569;
+        font-weight: 600;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        font-size: 0.75rem;
+    }
+
+    .badge-status-success {
+        background-color: #ecfdf5;
+        color: #065f46;
+        font-weight: 600;
+        padding: 6px 10px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .badge-status-danger {
+        background-color: #fef2f2;
+        color: #991b1b;
+        font-weight: 600;
+        padding: 6px 10px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* BOTÕES DE AÇÃO */
+    .btn-action-edit, .btn-action-cancel {
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .btn-action-edit {
+        background-color: #fef9c3;
+        color: #854d0e;
+    }
+    .btn-action-edit:hover { background-color: #fef08a; }
+
+    .btn-action-cancel {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+    .btn-action-cancel:hover { background-color: #fecaca; }
+
+    /* FORMULÁRIO E MODAL */
+    .custom-modal-oficina {
+        border-radius: 14px;
+        border: none;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    .custom-input-oficina {
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 0.92rem;
+    }
+    .custom-input-oficina:focus {
+        border-color: #2c3e50;
+        box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+    }
+
+    .btn-oficina-fixed {
+        display: inline-block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #ffffff !important;
+        background-color: #2c3e50;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .btn-oficina-fixed:hover { background-color: #1a252f; transform: translateY(-1px); }
+
+    .btn-oficina-secondary {
+        display: inline-block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b !important;
+        background-color: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .btn-oficina-secondary:hover { background-color: #e2e8f0; }
+</style>
+
 <script>
-    // Inicializar Modal do Bootstrap
     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
 
-    // Abre o modal e preenche com os dados atuais
     function abrirModalEdicao(id, data, hora) {
         document.getElementById('edit_id').value = id;
         document.getElementById('nova_data').value = data;
@@ -113,10 +288,8 @@
         modalEditar.show();
     }
 
-    // Submeter formulário de edição
     document.getElementById('formEditarAgendamento').addEventListener('submit', async function(e) {
         e.preventDefault();
-        
         const id = document.getElementById('edit_id').value;
         const formData = new FormData(this);
 
@@ -139,7 +312,6 @@
         }
     });
 
-    // Função de Cancelamento
     async function cancelarAgendamento(id) {
         if (confirm("Tem certeza que deseja cancelar este agendamento?")) {
             try {

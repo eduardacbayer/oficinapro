@@ -697,6 +697,72 @@ def consulta_ordens():
         "consulta_ordens.html",
         ordens=ordens
     )
+@app.route("/ordem-servico/criar", methods=["POST"])
+def criar_ordem():
+    """HU09: Criar Ordem de Serviço a partir de um agendamento"""
+    try:
+        agendamento_id = request.form.get("agendamento_id")
+        if not agendamento_id:
+            return jsonify({"sucesso": False, "mensagem": "❌ Agendamento inválido!"}), 400
+
+        db = get_db()
+        cursor = db.cursor()
+        
+        # Cria a OS vinculada ao agendamento
+        cursor.execute("INSERT INTO ordens_servico (agendamento_id, status) VALUES (?, 'Aberta')", (agendamento_id,))
+        # Atualiza o agendamento original para saber que ele virou uma OS em andamento
+        cursor.execute("UPDATE agendamentos SET status = 'Em Atendimento' WHERE id = ?", (agendamento_id,))
+        
+        db.commit()
+        db.close()
+        return jsonify({"sucesso": True, "mensagem": "✅ Ordem de Serviço aberta com sucesso!"}), 201
+    except Exception as e:
+        return jsonify({"sucesso": False, "mensagem": f"❌ Erro: {str(e)}"}), 500
+
+
+@app.route("/ordem-servico/<int:os_id>/atualizar", methods=["POST"])
+def atualizar_ordem(os_id):
+    """HU10, HU11, HU12: Atualizar Diagnóstico, Serviços Executados e Status"""
+    try:
+        diagnostico = request.form.get("diagnostico", "").strip()
+        servicos_executados = request.form.get("servicos_executados", "").strip()
+        status = request.form.get("status", "Aberta")
+
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("""
+            UPDATE ordens_servico 
+            SET diagnostico = ?, servicos_executados = ?, status = ?
+            WHERE id = ?
+        """, (diagnostico, servicos_executados, status, os_id))
+        
+        db.commit()
+        db.close()
+        return jsonify({"sucesso": True, "mensagem": "✅ Ordem de Serviço atualizada com sucesso!"}), 200
+    except Exception as e:
+        return jsonify({"sucesso": False, "mensagem": f"❌ Erro: {str(e)}"}), 500
+
+
+@app.route("/ordem-servico/<int:os_id>/encerrar", methods=["POST"])
+def encerrar_ordem(os_id):
+    """HU13: Encerrar Ordem de Serviço registrando a data/hora final"""
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        
+        # Encerra a OS mudando o status para 'Concluída' e registrando a data atual do computador
+        cursor.execute("""
+            UPDATE ordens_servico 
+            SET status = 'Concluída', data_encerramento = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """, (os_id,))
+        
+        db.commit()
+        db.close()
+        return jsonify({"sucesso": True, "mensagem": "✅ Ordem de Serviço encerrada com sucesso!"}), 200
+    except Exception as e:
+        return jsonify({"sucesso": False, "mensagem": f"❌ Erro: {str(e)}"}), 500
+
 
 # ==================== ERROS ====================
 

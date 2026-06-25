@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Nova Ordem de Serviço{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2>Nova Ordem de Serviço</h2>
+
+    <form method="POST">
+
+        <div class="mb-3">
+            <label class="form-label">Agendamento</label>
+
+            <select
+                name="agendamento_id"
+                class="form-control"
+                required>
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for a in agendamentos %}
+                <option value="{{ a.id }}">
+                    Agendamento #{{ a.id }} - {{ a.nome }}
+                </option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                Diagnóstico
+            </label>
+
+            <textarea
+                name="diagnostico"
+                class="form-control"
+                rows="4"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                Serviços Executados
+            </label>
+
+            <textarea
+                name="servicos_executados"
+                class="form-control"
+                rows="4"></textarea>
+        </div>
+
+        <button
+            type="submit"
+            class="btn btn-success">
+
+            Salvar Ordem de Serviço
+
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

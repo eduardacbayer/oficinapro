@@ -3,86 +3,201 @@
 {% block title %}Novo Agendamento{% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="row mb-5">
     <div class="col-lg-8 mx-auto">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="bi bi-calendar-plus"></i> Registrar Novo Agendamento</h5>
-            </div>
-            <div class="card-body">
-                <form id="formCadastroAgendamento">
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="cliente_id" class="form-label">
-                                <i class="bi bi-person"></i> Cliente *
-                            </label>
-                            <select class="form-select" id="cliente_id" name="cliente_id" required>
-                                <option value="">Selecione um cliente...</option>
-                                {% for cliente in clientes %}
-                                    <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label for="veiculo_id" class="form-label">
-                                <i class="bi bi-car-front"></i> Veículo *
-                            </label>
-                            <select class="form-select" id="veiculo_id" name="veiculo_id" required disabled>
-                                <option value="">Selecione o cliente primeiro...</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="data" class="form-label">
-                                <i class="bi bi-calendar-event"></i> Data do Agendamento *
-                            </label>
-                            <input type="date" class="form-control" id="data" name="data" required>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label for="hora" class="form-label">
-                                <i class="bi bi-clock"></i> Horário *
-                            </label>
-                            <input type="time" class="form-control" id="hora" name="hora" required>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="descricao" class="form-label">
-                            <i class="bi bi-card-text"></i> Descrição do Serviço
-                        </label>
-                        <textarea class="form-control" id="descricao" name="descricao" rows="3" placeholder="Ex: Revisão de 10.000km, Troca de óleo..."></textarea>
-                    </div>
-
-                    <div class="alert alert-info" role="alert">
-                        <i class="bi bi-info-circle"></i> 
-                        <strong>Campos obrigatórios:</strong> Cliente, Veículo, Data e Horário.
-                    </div>
-
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="/" class="btn btn-secondary">
-                            <i class="bi bi-x-circle"></i> Cancelar
-                        </a>
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-check-circle"></i> Confirmar Agendamento
-                        </button>
-                    </div>
-                </form>
-
-                <div id="loadingIndicator" class="loading" style="display: none;">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Processando...</span>
-                    </div>
-                    <p>Registrando agendamento...</p>
+        <!-- CARD DA OFICINA REFINADO -->
+        <div class="card-oficina-clean p-4 p-md-5">
+            
+            <!-- HEADER DA TELA INTERNA -->
+            <div class="text-center mb-4">
+                <div class="icon-circle mb-3 mx-auto">
+                    <i class="bi bi-calendar-plus"></i>
                 </div>
+                <h4 class="card-title-oficina mb-1" style="font-size: 1.4rem;">Registrar Novo Agendamento</h4>
+                <p class="card-text-oficina">Defina a data, horário e o veículo para a ordem de serviço.</p>
             </div>
+
+            <hr class="my-4" style="border-color: #f1f5f9;">
+
+            <form id="formCadastroAgendamento">
+                <!-- SELEÇÃO DE CLIENTE E VEÍCULO -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="cliente_id" class="form-label text-muted small" style="font-weight: 600;">
+                            <i class="bi bi-person me-1"></i> CLIENTE *
+                        </label>
+                        <select class="form-select custom-input-oficina" id="cliente_id" name="cliente_id" required>
+                            <option value="">Selecione um cliente...</option>
+                            {% for cliente in clientes %}
+                                <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="veiculo_id" class="form-label text-muted small" style="font-weight: 600;">
+                            <i class="bi bi-car-front-fill me-1"></i> VEÍCULO *
+                        </label>
+                        <select class="form-select custom-input-oficina" id="veiculo_id" name="veiculo_id" required disabled>
+                            <option value="">Selecione o cliente primeiro...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- DATA E HORÁRIO -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="data" class="form-label text-muted small" style="font-weight: 600;">
+                            <i class="bi bi-calendar-event me-1"></i> DATA DO AGENDAMENTO *
+                        </label>
+                        <input type="date" class="form-control custom-input-oficina" id="data" name="data" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="hora" class="form-label text-muted small" style="font-weight: 600;">
+                            <i class="bi bi-clock me-1"></i> HORÁRIO *
+                        </label>
+                        <input type="time" class="form-control custom-input-oficina" id="hora" name="hora" required>
+                    </div>
+                </div>
+
+                <!-- DESCRIÇÃO DO SERVIÇO -->
+                <div class="mb-4">
+                    <label for="descricao" class="form-label text-muted small" style="font-weight: 600;">
+                        <i class="bi bi-card-text me-1"></i> DESCRIÇÃO DO SERVIÇO
+                    </label>
+                    <textarea class="form-control custom-input-oficina" id="descricao" name="descricao" rows="3" placeholder="Ex: Revisão de 10.000km, Troca de óleo..."></textarea>
+                </div>
+
+                <!-- BADGE INFORMATIVO SUTIL -->
+                <div class="p-3 mb-4 rounded-3 text-muted small d-flex align-items-center" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
+                    <i class="bi bi-info-circle-fill text-muted me-2" style="font-size: 1.1rem;"></i> 
+                    <span><strong>Campos obrigatórios:</strong> Todos os marcados com asterisco (*).</span>
+                </div>
+
+                <!-- BOTÕES OPERACIONAIS ALINHADOS -->
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="/" class="btn-oficina-secondary">
+                        <i class="bi bi-x-circle me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-oficina-fixed">
+                        <i class="bi bi-check-circle me-1"></i> Confirmar
+                    </button>
+                </div>
+            </form>
+
+            <!-- LOADING INDICATOR REESTILIZADO -->
+            <div id="loadingIndicator" class="text-center mt-4" style="display: none;">
+                <div class="spinner-border text-dark spinner-border-sm" role="status">
+                    <span class="visually-hidden">Processando...</span>
+                </div>
+                <p class="text-muted small mt-2">Registrando agendamento...</p>
+            </div>
+            
         </div>
     </div>
 </div>
+
+<!-- ESTILOS EXCLUSIVOS DA TELA DE FORMULÁRIO -->
+<style>
+    body {
+        background-color: #f4f6f9 !important;
+    }
+
+    .card-oficina-clean {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    }
+
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+        background-color: #2c3e50;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-size: 1.6rem;
+    }
+
+    .card-title-oficina {
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .card-text-oficina {
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+
+    /* CUSTOMIZAÇÃO PREMIUM DOS INPUTS */
+    .custom-input-oficina {
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 0.92rem;
+        color: #334155;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .custom-input-oficina:focus {
+        background-color: #ffffff;
+        border-color: #2c3e50;
+        outline: 0;
+        box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+    }
+
+    .custom-input-oficina:disabled {
+        background-color: #f1f5f9;
+        border-color: #e2e8f0;
+        color: #94a3b8;
+    }
+
+    /* BOTÕES DA IDENTIDADE VISUAL */
+    .btn-oficina-fixed {
+        display: inline-block;
+        width: auto;
+        padding: 10px 24px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #ffffff !important;
+        background-color: #2c3e50;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        box-shadow: 0 4px 6px rgba(44, 62, 80, 0.12);
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-oficina-fixed:hover {
+        background-color: #1a252f;
+        box-shadow: 0 6px 14px rgba(44, 62, 80, 0.2);
+        transform: translateY(-1px);
+    }
+
+    .btn-oficina-secondary {
+        display: inline-block;
+        width: auto;
+        padding: 10px 24px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #64748b !important;
+        background-color: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-oficina-secondary:hover {
+        background-color: #e2e8f0;
+        color: #334155 !important;
+    }
+</style>
 {% endblock %}
 
 {% block extra_js %}

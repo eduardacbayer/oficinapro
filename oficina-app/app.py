@@ -681,21 +681,43 @@ def api_veiculos_cliente(cliente_id):
     
 @app.route("/ordens-servico")
 def consulta_ordens():
-    db = get_db()
+db = get_db()
     cursor = db.cursor()
 
     cursor.execute("""
-        SELECT *
-        FROM ordens_servico
-        ORDER BY id DESC
+        SELECT
+            os.id,
+            c.nome,
+            v.modelo,
+            v.placa,
+            os.status,
+            os.diagnostico,
+            os.servicos_executados,
+            os.data_abertura,
+            os.data_encerramento
+
+        FROM ordens_servico os
+
+        JOIN agendamentos a
+            ON os.agendamento_id = a.id
+
+        JOIN clientes c
+            ON a.cliente_id = c.id
+
+        JOIN veiculos v
+            ON a.veiculo_id = v.id
+
+        ORDER BY os.id DESC
     """)
 
     ordens = cursor.fetchall()
+
     db.close()
 
     return render_template(
         "consulta_ordens.html",
         ordens=ordens
+    
     )
 @app.route("/ordem-servico/criar", methods=["POST"])
 def criar_ordem():
@@ -719,7 +741,54 @@ def criar_ordem():
     except Exception as e:
         return jsonify({"sucesso": False, "mensagem": f"❌ Erro: {str(e)}"}), 500
 
+@app.route("/ordem-servico/<int:id>/editar", methods=["GET", "POST"])
+def editar_ordem(id):
 
+    db = get_db()
+    cursor = db.cursor()
+
+    if request.method == "POST":
+
+        diagnostico = request.form.get("diagnostico")
+        servicos = request.form.get("servicos_executados")
+
+        cursor.execute("""
+            UPDATE ordens_servico
+            SET
+                diagnostico=?,
+                servicos_executados=?
+            WHERE id=?
+        """,
+        (
+            diagnostico,
+            servicos,
+            id
+        ))
+
+        db.commit()
+
+        db.close()
+
+        return redirect(url_for("consulta_ordens"))
+
+    cursor.execute("""
+
+        SELECT *
+
+        FROM ordens_servico
+
+        WHERE id=?
+
+    """, (id,))
+
+    ordem = cursor.fetchone()
+
+    db.close()
+
+    return render_template(
+        "editar_ordem.html",
+        ordem=ordem
+    )
 @app.route("/ordem-servico/<int:os_id>/atualizar", methods=["POST"])
 def atualizar_ordem(os_id):
     """HU10, HU11, HU12: Atualizar Diagnóstico, Serviços Executados e Status"""

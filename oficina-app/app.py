@@ -825,4 +825,5 @@ def erro_servidor(error):
 if __name__ == "__main__":
     init_db()
     # Debug=True permite recarregar automaticamente quando você modifica o código
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    porta = int(os.environ.get("PORT", 5000))
+    app.run(debug=False, host="0.0.0.0", port=porta)

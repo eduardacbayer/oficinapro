@@ -685,9 +685,24 @@ def consulta_ordens():
     cursor = db.cursor()
 
     cursor.execute("""
-        SELECT *
-        FROM ordens_servico
-        ORDER BY id DESC
+        SELECT
+            os.id,
+            os.status,
+            os.diagnostico,
+            os.servicos_executados,
+            os.data_abertura,
+            c.nome as cliente_nome,
+            v.marca,
+            v.modelo,
+            v.placa
+        FROM ordens_servico os
+        JOIN agendamentos a
+            ON os.agendamento_id = a.id
+        JOIN clientes c
+            ON a.cliente_id = c.id
+        JOIN veiculos v
+            ON a.veiculo_id = v.id
+        ORDER BY os.id DESC
     """)
 
     ordens = cursor.fetchall()

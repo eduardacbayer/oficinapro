@@ -717,22 +717,32 @@ def criar_ordem():
     """HU09: Criar Ordem de Serviço a partir de um agendamento"""
     try:
         agendamento_id = request.form.get("agendamento_id")
+        diagnostico = request.form.get("diagnostico", "").strip()
+        servicos_executados = request.form.get("servicos_executados", "").strip()
+
         if not agendamento_id:
-            return jsonify({"sucesso": False, "mensagem": "❌ Agendamento inválido!"}), 400
+            return "❌ Agendamento inválido!", 400
 
         db = get_db()
         cursor = db.cursor()
         
-        # Cria a OS vinculada ao agendamento
-        cursor.execute("INSERT INTO ordens_servico (agendamento_id, status) VALUES (?, 'Aberta')", (agendamento_id,))
-        # Atualiza o agendamento original para saber que ele virou uma OS em andamento
+        # Cria a OS vinculada ao agendamento, salvando também o diagnóstico e serviços iniciais
+        cursor.execute("""
+            INSERT INTO ordens_servico (agendamento_id, diagnostico, servicos_executados, status) 
+            VALUES (?, ?, ?, 'Aberta')
+        """, (agendamento_id, diagnostico, servicos_executados))
+        
+        # Atualiza o agendamento original para 'Em Atendimento'
         cursor.execute("UPDATE agendamentos SET status = 'Em Atendimento' WHERE id = ?", (agendamento_id,))
         
         db.commit()
         db.close()
-        return jsonify({"sucesso": True, "mensagem": "✅ Ordem de Serviço aberta com sucesso!"}), 201
+        
+        # Redireciona de volta para a listagem de ordens de serviço de forma elegante!
+        return redirect("/ordens-servico")
+        
     except Exception as e:
-        return jsonify({"sucesso": False, "mensagem": f"❌ Erro: {str(e)}"}), 500
+        return f"❌ Erro ao criar Ordem de Serviço: {str(e)}", 500
 
 
 @app.route("/ordem-servico/<int:os_id>/atualizar", methods=["POST"])
@@ -777,6 +787,24 @@ def encerrar_ordem(os_id):
         return jsonify({"sucesso": True, "mensagem": "✅ Ordem de Serviço encerrada com sucesso!"}), 200
     except Exception as e:
         return jsonify({"sucesso": False, "mensagem": f"❌ Erro: {str(e)}"}), 500
+
+@app.route("/ordem-servico/nova", methods=["GET"])
+def nova_ordem_tela():
+    """Rota para abrir a tela de formulário de Nova Ordem de Serviço"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    # Busca os agendamentos que estão confirmados para listar no <select> do formulário
+    cursor.execute("""
+        SELECT a.id, c.nome 
+        FROM agendamentos a
+        JOIN clientes c ON a.cliente_id = c.id
+        WHERE a.status = 'Agendado'
+    """)
+    agendamentos = cursor.fetchall()
+    db.close()
+    
+    return render_template("cadastro_ordem.html", agendamentos=agendamentos)
 
 
 # ==================== ERROS ====================

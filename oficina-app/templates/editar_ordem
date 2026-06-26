@@ -1,0 +1,20 @@
+<br>
+
+<textarea
+name="servicos_executados"
+rows="8"
+cols="70">{{ ordem.servicos_executados }}</textarea>
+
+<br><br>
+
+<button type="submit">
+
+Salvar
+
+</button>
+
+</form>
+
+</body>
+
+</html>

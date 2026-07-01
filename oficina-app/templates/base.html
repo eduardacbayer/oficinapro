@@ -277,3 +277,64 @@
     </div>
 
     <footer class="footer">
+        <div class="container">
+            <p class="mb-0">&copy; 2026 Oficina Auto System. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Formata o campo de telefone no padrão (XX) XXXXX-XXXX
+        function formatarTelefone(input) {
+            let valor = input.value.replace(/\D/g, '');
+            valor = valor.substring(0, 11);
+
+            if (valor.length > 6) {
+                valor = valor.replace(/(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3');
+            } else if (valor.length > 2) {
+                valor = valor.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+            } else if (valor.length > 0) {
+                valor = valor.replace(/(\d{0,2})/, '($1');
+            }
+
+            input.value = valor;
+        }
+
+        // Exibe mensagem de sucesso em tela
+        function mostrarSucesso(mensagem) {
+            let container = document.getElementById('mensagemContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'mensagemContainer';
+                document.querySelector('.container-main .container').prepend(container);
+            }
+            container.innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    ${mensagem}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Exibe mensagem de erro em tela
+        function mostrarErro(mensagem) {
+            let container = document.getElementById('mensagemContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'mensagemContainer';
+                document.querySelector('.container-main .container').prepend(container);
+            }
+            container.innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    ${mensagem}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

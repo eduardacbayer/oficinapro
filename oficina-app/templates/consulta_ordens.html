@@ -27,6 +27,7 @@
                 <th>Status</th>
                 <th>Diagnóstico</th>
                 <th>Data Abertura</th>
+                <th>Ações</th>
             </tr>
         </thead>
 
@@ -51,6 +52,12 @@
                 <td>{{ os.diagnostico }}</td>
 
                 <td>{{ os.data_abertura }}</td>
+
+                <td>
+                    <a href="/ordem-servico/{{ os.id }}/atualizar-status" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil-square"></i> Atualizar Status
+                    </a>
+                </td>
 
             </tr>
 

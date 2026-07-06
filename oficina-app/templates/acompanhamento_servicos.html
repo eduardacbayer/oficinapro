@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Acompanhamento de Serviços{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <!-- CABEÇALHO -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Meus Serviços em Andamento</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-0">Acompanhe o status de todos os seus veículos em manutenção</p>
+            </div>
+        </div>
+
+        <!-- SERVIÇOS -->
+        {% if servicos %}
+            {% for servico in servicos %}
+            <div class="card mb-3">
+                <div class="card-header {% if servico['status'] == 'Aberta' %}bg-warning{% elif servico['status'] == 'Em Andamento' %}bg-info{% elif servico['status'] == 'Concluída' %}bg-success{% else %}bg-danger{% endif %} text-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="mb-0">
+                                <i class="bi bi-car-front"></i> {{ servico['marca'] }} {{ servico['modelo'] }} 
+                                <span class="badge bg-dark">{{ servico['placa'] }}</span>
+                            </h6>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-light text-dark">{{ servico['status'] }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p>
+                                <strong><i class="bi bi-card-text"></i> Serviço:</strong><br>
+                                {{ servico['descricao_agendamento'] or 'Nenhuma descrição' }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p>
+                                <strong><i class="bi bi-calendar"></i> Aberto em:</strong><br>
+                                {{ servico['data_abertura'][:10] }} às {{ servico['data_abertura'][11:16] }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- BARRA DE PROGRESSO -->
+                    <div class="mb-3">
+                        <strong>Progresso da Execução:</strong>
+                        <div class="progress">
+                            <div class="progress-bar {% if servico['percentual_conclusao'] >= 100 %}bg-success{% elif servico['percentual_conclusao'] >= 75 %}bg-info{% elif servico['percentual_conclusao'] >= 50 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ servico['percentual_conclusao'] or 0 }}%" 
+                                 aria-valuenow="{{ servico['percentual_conclusao'] or 0 }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {{ servico['percentual_conclusao'] or 0 }}%
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ETAPA ATUAL -->
+                    {% if servico['etapa'] %}
+                    <p>
+                        <strong><i class="bi bi-info-circle"></i> Etapa Atual:</strong><br>
+                        <span class="badge bg-secondary">{{ servico['etapa'] }}</span>
+                    </p>
+                    {% endif %}
+
+                    <!-- STATUS FINAL -->
+                    {% if servico['status'] == 'Concluída' %}
+                    <div class="alert alert-success" role="alert">
+                        <i class="bi bi-check-circle"></i>
+                        <strong>Serviço Concluído!</strong><br>
+                        <small>Seu veículo está pronto para retirada em {{ servico['data_encerramento'][:10] }} às {{ servico['data_encerramento'][11:16] }}</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i>
+                <strong>Nenhum serviço em andamento</strong>
+                <p>Você não possui serviços sendo executados no momento.</p>
+            </div>
+        {% endif %}
+
+        <!-- AÇÃO -->
+        <div class="mt-4 text-center">
+            <a href="/" class="btn btn-secondary">
+                <i class="bi bi-house"></i> Voltar ao Início
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-atualizar a cada 30 segundos
+    setInterval(() => {
+        location.reload();
+    }, 30000);
+</script>
+{% endblock %}

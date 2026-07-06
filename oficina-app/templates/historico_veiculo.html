@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Histórico de {{ veiculo['placa'] }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <!-- CABEÇALHO -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Histórico Completo do Veículo</h5>
+                    </div>
+                    <div class="col-auto">
+                        <a href="/consulta-veiculo" class="btn btn-light btn-sm">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>
+                            <strong><i class="bi bi-car-front"></i> Veículo:</strong><br>
+                            {{ veiculo['marca'] }} {{ veiculo['modelo'] }} ({{ veiculo['ano'] or 'Ano não informado' }})
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>
+                            <strong><i class="bi bi-tag"></i> Placa:</strong><br>
+                            <span class="badge bg-dark" style="font-size: 1rem;">{{ veiculo['placa'] }}</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>
+                            <strong><i class="bi bi-palette"></i> Cor:</strong><br>
+                            {{ veiculo['cor'] or 'Não informada' }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>
+                            <strong><i class="bi bi-person"></i> Proprietário:</strong><br>
+                            {{ veiculo['cliente_nome'] }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABAS -->
+        <ul class="nav nav-tabs mb-4" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab-historico" data-bs-toggle="tab" data-bs-target="#historico-content" type="button">
+                    <i class="bi bi-receipt"></i> Serviços Realizados ({{ historico|length }})
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-ordens" data-bs-toggle="tab" data-bs-target="#ordens-content" type="button">
+                    <i class="bi bi-clipboard-check"></i> Últimas Ordens de Serviço ({{ ultimas_ordens|length }})
+                </button>
+            </li>
+        </ul>
+
+        <!-- CONTEÚDO DAS ABAS -->
+        <div class="tab-content">
+            <!-- TAB 1: HISTÓRICO -->
+            <div class="tab-pane fade show active" id="historico-content" role="tabpanel">
+                {% if historico %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th><i class="bi bi-calendar"></i> Data</th>
+                                    <th><i class="bi bi-hammer"></i> Tipo de Serviço</th>
+                                    <th>Descrição</th>
+                                    <th><i class="bi bi-cash"></i> Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for servico in historico %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ servico['data_servico'] }}</strong><br>
+                                        <small class="text-muted">{{ servico['data_registro'][:10] }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ servico['tipo_servico'] }}</span>
+                                    </td>
+                                    <td>{{ servico['descricao'] or '-' }}</td>
+                                    <td>
+                                        {% if servico['valor'] %}
+                                            <strong>R$ {{ "%.2f"|format(servico['valor']) }}</strong>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- RESUMO FINANCEIRO -->
+                    <div class="card bg-light mt-3">
+                        <div class="card-body">
+                            <strong><i class="bi bi-graph-up"></i> Resumo de Investimentos:</strong><br>
+                            {% set total = historico|map(attribute='valor')|select('ne', None)|list|sum %}
+                            Total investido em manutenção: <strong>R$ {{ "%.2f"|format(total) }}</strong>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Nenhum serviço registrado</strong>
+                        <p>Este veículo não possui histórico de serviços cadastrados.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- TAB 2: ORDENS DE SERVIÇO -->
+            <div class="tab-pane fade" id="ordens-content" role="tabpanel">
+                {% if ultimas_ordens %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Status</th>
+                                    <th>Descrição</th>
+                                    <th><i class="bi bi-calendar"></i> Abertura</th>
+                                    <th><i class="bi bi-calendar-check"></i> Conclusão</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ordem in ultimas_ordens %}
+                                <tr>
+                                    <td><strong>#{{ ordem['id'] }}</strong></td>
+                                    <td>
+                                        {% if ordem['status'] == 'Aberta' %}
+                                            <span class="badge bg-warning">{{ ordem['status'] }}</span>
+                                        {% elif ordem['status'] == 'Em Andamento' %}
+                                            <span class="badge bg-info">{{ ordem['status'] }}</span>
+                                        {% elif ordem['status'] == 'Concluída' %}
+                                            <span class="badge bg-success">{{ ordem['status'] }}</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">{{ ordem['status'] }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ ordem['descricao'] or '-' }}</td>
+                                    <td><small>{{ ordem['data_abertura'][:10] }}</small></td>
+                                    <td>
+                                        {% if ordem['data_encerramento'] %}
+                                            <small>{{ ordem['data_encerramento'][:10] }}</small>
+                                        {% else %}
+                                            <span class="text-muted">Em andamento</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Nenhuma ordem de serviço</strong>
+                        <p>Este veículo não possui ordens de serviço registradas.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- AÇÕES -->
+        <div class="mt-4 text-center">
+            <a href="/" class="btn btn-secondary">
+                <i class="bi bi-house"></i> Voltar ao Início
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

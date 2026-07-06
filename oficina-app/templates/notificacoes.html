@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Notificações{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <!-- CABEÇALHO -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-bell"></i> Suas Notificações</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-0">Acompanhe as atualizações sobre seus veículos em manutenção</p>
+            </div>
+        </div>
+
+        <!-- NOTIFICAÇÕES -->
+        {% if notificacoes %}
+            {% for notif in notificacoes %}
+            <div class="card mb-3 border-left-{{ 'success' if notif['tipo'] == 'conclusao' else 'info' }}">
+                <div class="card-body">
+                    <div class="row align-items-start">
+                        <div class="col">
+                            <!-- ÍCONE E MENSAGEM -->
+                            <div class="d-flex align-items-start">
+                                {% if notif['tipo'] == 'conclusao' %}
+                                    <div class="badge bg-success text-white" style="font-size: 1.2rem; padding: 0.5rem 0.7rem;">
+                                        <i class="bi bi-check-circle"></i>
+                                    </div>
+                                {% elif notif['tipo'] == 'atualizacao' %}
+                                    <div class="badge bg-info text-white" style="font-size: 1.2rem; padding: 0.5rem 0.7rem;">
+                                        <i class="bi bi-clock-history"></i>
+                                    </div>
+                                {% else %}
+                                    <div class="badge bg-warning text-white" style="font-size: 1.2rem; padding: 0.5rem 0.7rem;">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="ms-3">
+                                    <h6 class="mb-1">
+                                        {% if notif['tipo'] == 'conclusao' %}
+                                            <i class="bi bi-check-circle"></i> Serviço Concluído
+                                        {% elif notif['tipo'] == 'atualizacao' %}
+                                            <i class="bi bi-clock-history"></i> Atualização de Andamento
+                                        {% else %}
+                                            <i class="bi bi-info-circle"></i> Notificação
+                                        {% endif %}
+                                    </h6>
+                                    <p class="mb-2">{{ notif['mensagem'] }}</p>
+                                    
+                                    {% if notif['placa'] %}
+                                    <small class="text-muted">
+                                        <i class="bi bi-car-front"></i> 
+                                        {{ notif['marca'] }} {{ notif['modelo'] }} 
+                                        <span class="badge bg-dark">{{ notif['placa'] }}</span>
+                                    </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto text-end">
+                            <small class="text-muted">
+                                <i class="bi bi-calendar"></i> 
+                                {{ notif['data_criacao'][:10] }}<br>
+                                <i class="bi bi-clock"></i> 
+                                {{ notif['data_criacao'][11:16] }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- BOTÃO VOLTAR -->
+            <div class="mt-4 text-center">
+                <a href="/" class="btn btn-secondary">
+                    <i class="bi bi-house"></i> Voltar ao Início
+                </a>
+            </div>
+
+        {% else %}
+            <!-- SEM NOTIFICAÇÕES -->
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-bell-slash" style="font-size: 3rem; color: #bbb;"></i>
+                    <h5 class="mt-3">Nenhuma Notificação</h5>
+                    <p class="text-muted">Você não possui notificações no momento. Serviços concluídos aparecerão aqui.</p>
+                </div>
+            </div>
+
+            <div class="mt-4 text-center">
+                <a href="/" class="btn btn-secondary">
+                    <i class="bi bi-house"></i> Voltar ao Início
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ESTILOS EXTRAS -->
+<style>
+    .border-left-success {
+        border-left: 4px solid #27ae60 !important;
+    }
+    
+    .border-left-info {
+        border-left: 4px solid #3498db !important;
+    }
+    
+    .border-left-warning {
+        border-left: 4px solid #f39c12 !important;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-atualizar a cada 60 segundos
+    setInterval(() => {
+        location.reload();
+    }, 60000);
+</script>
+{% endblock %}

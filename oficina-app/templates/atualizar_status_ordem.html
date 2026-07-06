@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Atualizar Status da Ordem de Serviço{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Atualizar Status da Ordem de Serviço</h5>
+            </div>
+            <div class="card-body">
+                <form id="formAtualizarStatus">
+                    <input type="hidden" id="os_id" name="os_id" value="{{ os_id }}">
+
+                    <!-- INFORMAÇÕES DA OS -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <p>
+                                <strong><i class="bi bi-clipboard-check"></i> Ordem de Serviço #</strong>{{ os_id }}<br>
+                                <strong><i class="bi bi-car-front"></i> Veículo:</strong> 
+                                <span id="info-veiculo">{{ ordem['marca'] }} {{ ordem['modelo'] }} ({{ ordem['placa'] }})</span><br>
+                                <strong><i class="bi bi-person"></i> Cliente:</strong> 
+                                <span id="info-cliente">{{ ordem['cliente_nome'] }}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- STATUS -->
+                    <div class="mb-4">
+                        <label for="status" class="form-label">
+                            <i class="bi bi-tag-fill"></i> Status da Ordem *
+                        </label>
+                        <select class="form-select form-select-lg" id="status" name="status" required>
+                            <option value="">-- Selecione um status --</option>
+                            <option value="Aberta" {% if ordem['status'] == 'Aberta' %}selected{% endif %}>📋 Aberta - Aguardando avaliação</option>
+                            <option value="Em Andamento" {% if ordem['status'] == 'Em Andamento' %}selected{% endif %}>🔧 Em Andamento - Serviço em execução</option>
+                            <option value="Aguardando Peças" {% if ordem['status'] == 'Aguardando Peças' %}selected{% endif %}>⏳ Aguardando Peças - Aguardando materiais</option>
+                            <option value="Concluída" {% if ordem['status'] == 'Concluída' %}selected{% endif %}>✅ Concluída - Serviço finalizado</option>
+                            <option value="Cancelada" {% if ordem['status'] == 'Cancelada' %}selected{% endif %}>❌ Cancelada - Serviço cancelado</option>
+                        </select>
+                    </div>
+
+                    <!-- ETAPA ATUAL -->
+                    <div class="mb-4">
+                        <label for="etapa" class="form-label">
+                            <i class="bi bi-list-check"></i> Etapa Atual
+                        </label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="etapa" 
+                            name="etapa"
+                            value="{{ ordem['etapa'] or '' }}"
+                            placeholder="Ex: Diagnóstico, Substituição de peças, Testes finais..."
+                        >
+                        <small class="text-muted">Descreva a etapa específica do atendimento</small>
+                    </div>
+
+                    <!-- PERCENTUAL DE CONCLUSÃO -->
+                    <div class="mb-4">
+                        <label for="percentual" class="form-label">
+                            <i class="bi bi-percent"></i> Percentual de Conclusão
+                        </label>
+                        <div class="input-group">
+                            <input 
+                                type="range" 
+                                class="form-range" 
+                                id="percentual" 
+                                name="percentual"
+                                min="0" 
+                                max="100" 
+                                value="{{ ordem['percentual_conclusao'] or 0 }}"
+                                oninput="atualizarPercentual(this.value)"
+                            >
+                            <span class="input-group-text ms-2">
+                                <span id="percentual-display">{{ ordem['percentual_conclusao'] or 0 }}%</span>
+                            </span>
+                        </div>
+                        <div class="progress mt-2">
+                            <div 
+                                class="progress-bar bg-info" 
+                                id="progress-bar"
+                                role="progressbar" 
+                                style="width: {{ ordem['percentual_conclusao'] or 0 }}%" 
+                                aria-valuenow="{{ ordem['percentual_conclusao'] or 0 }}" 
+                                aria-valuemin="0" 
+                                aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OBSERVAÇÕES -->
+                    <div class="mb-4">
+                        <label for="observacoes" class="form-label">
+                            <i class="bi bi-card-text"></i> Observações Adicionais
+                        </label>
+                        <textarea 
+                            class="form-control" 
+                            id="observacoes" 
+                            name="observacoes"
+                            rows="3"
+                            placeholder="Informações relevantes sobre o andamento do serviço..."
+                        >{{ ordem['observacoes'] or '' }}</textarea>
+                    </div>
+
+                    <!-- ALERT INFO -->
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Atenção:</strong> Ao marcar como "Concluída", o cliente receberá automaticamente uma notificação de conclusão.
+                    </div>
+
+                    <!-- BOTÕES -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/consulta-ordens" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle"></i> Salvar Atualização
+                        </button>
+                    </div>
+                </form>
+
+                <div id="loadingIndicator" class="loading" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Salvando...</span>
+                    </div>
+                    <p>Atualizando status da ordem de serviço...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Atualizar exibição do percentual
+    function atualizarPercentual(valor) {
+        document.getElementById('percentual-display').textContent = valor + '%';
+        document.getElementById('progress-bar').style.width = valor + '%';
+        document.getElementById('progress-bar').setAttribute('aria-valuenow', valor);
+        
+        // Alterar cor da barra
+        const bar = document.getElementById('progress-bar');
+        if (valor >= 100) {
+            bar.classList.remove('bg-info');
+            bar.classList.add('bg-success');
+        } else if (valor >= 75) {
+            bar.classList.remove('bg-info');
+            bar.classList.add('bg-info');
+        } else if (valor >= 50) {
+            bar.classList.remove('bg-info');
+            bar.classList.add('bg-warning');
+        } else {
+            bar.classList.remove('bg-success', 'bg-warning');
+            bar.classList.add('bg-danger');
+        }
+    }
+
+    // Ajusta a cor da barra de progresso já ao carregar a página, de acordo com o valor pré-preenchido
+    document.addEventListener('DOMContentLoaded', function() {
+        atualizarPercentual(document.getElementById('percentual').value);
+    });
+
+    // Envio do formulário
+    document.getElementById('formAtualizarStatus').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const status = document.getElementById('status').value;
+
+        if (!status) {
+            mostrarErro('❌ Por favor, selecione um status!');
+            return;
+        }
+
+        document.getElementById('loadingIndicator').style.display = 'block';
+
+        try {
+            const response = await fetch(`/ordem-servico/{{ os_id }}/atualizar-status`, {
+                method: 'POST',
+                body: new FormData(this)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                mostrarSucesso(data.mensagem);
+                
+                // Redirecionar após 2 segundos
+                setTimeout(() => {
+                    window.location.href = '/consulta-ordens';
+                }, 2000);
+            } else {
+                mostrarErro(data.mensagem);
+            }
+        } catch (error) {
+            mostrarErro('❌ Erro ao atualizar: ' + error.message);
+        } finally {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

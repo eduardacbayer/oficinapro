@@ -807,6 +807,289 @@ def nova_ordem_tela():
     return render_template("cadastro_ordem.html", agendamentos=agendamentos)
 
 
+# ==================== NOVAS FUNCIONALIDADES ====================
+# HU: Atualizar Status/Etapa/Progresso da OS (com notificação automática)
+# HU: Notificações ao Cliente
+# HU: Acompanhamento de Serviços em Andamento (cliente)
+# HU: Histórico Completo do Veículo
+#
+# As rotas abaixo foram adicionadas sem alterar nenhuma rota, função ou
+# lógica já existente no arquivo original.
+
+
+def migrar_banco():
+    """Garante que as tabelas/colunas necessárias para as novas
+    funcionalidades existam, tanto em bancos novos quanto em bancos
+    já existentes (como o oficina.db atual), sem apagar nenhum dado."""
+    db = get_db()
+    cursor = db.cursor()
+
+    # Novas colunas em ordens_servico: etapa, percentual de conclusão e observações
+    colunas_novas = {
+        "etapa": "TEXT",
+        "percentual_conclusao": "INTEGER DEFAULT 0",
+        "observacoes": "TEXT",
+    }
+    cursor.execute("PRAGMA table_info(ordens_servico)")
+    colunas_existentes = [col["name"] for col in cursor.fetchall()]
+    for nome, tipo in colunas_novas.items():
+        if nome not in colunas_existentes:
+            cursor.execute(f"ALTER TABLE ordens_servico ADD COLUMN {nome} {tipo}")
+
+    # Tabela de histórico de serviços realizados por veículo
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS historico_servicos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            veiculo_id INTEGER NOT NULL,
+            ordem_servico_id INTEGER,
+            tipo_servico TEXT,
+            descricao TEXT,
+            valor REAL,
+            data_servico DATE DEFAULT (DATE('now')),
+            data_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (veiculo_id) REFERENCES veiculos(id),
+            FOREIGN KEY (ordem_servico_id) REFERENCES ordens_servico(id)
+        )
+    """)
+
+    # Tabela de notificações enviadas ao cliente
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS notificacoes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            cliente_id INTEGER,
+            veiculo_id INTEGER,
+            ordem_servico_id INTEGER,
+            tipo TEXT NOT NULL,
+            mensagem TEXT NOT NULL,
+            data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+            FOREIGN KEY (veiculo_id) REFERENCES veiculos(id),
+            FOREIGN KEY (ordem_servico_id) REFERENCES ordens_servico(id)
+        )
+    """)
+
+    db.commit()
+    db.close()
+    print("✅ Migração de banco concluída (tabelas/colunas novas verificadas)!")
+
+
+@app.route("/ordem-servico/<int:os_id>/atualizar-status", methods=["GET", "POST"])
+def atualizar_status_ordem(os_id):
+    """HU: Atualizar status, etapa e percentual de conclusão de uma OS,
+    notificando automaticamente o cliente (inclusive ao concluir o serviço)."""
+    db = get_db()
+    cursor = db.cursor()
+
+    if request.method == "POST":
+        try:
+            status = request.form.get("status", "").strip()
+            etapa = request.form.get("etapa", "").strip()
+            percentual = request.form.get("percentual", "0").strip()
+            observacoes = request.form.get("observacoes", "").strip()
+
+            if not status:
+                db.close()
+                return jsonify({"sucesso": False, "mensagem": "❌ Por favor, selecione um status!"}), 400
+
+            try:
+                percentual_int = int(percentual)
+            except ValueError:
+                percentual_int = 0
+            percentual_int = max(0, min(100, percentual_int))
+
+            # Busca dados do veículo/cliente vinculados à OS (necessário p/ notificação)
+            cursor.execute("""
+                SELECT os.id, a.veiculo_id, a.cliente_id, v.marca, v.modelo, v.placa
+                FROM ordens_servico os
+                JOIN agendamentos a ON os.agendamento_id = a.id
+                JOIN veiculos v ON a.veiculo_id = v.id
+                WHERE os.id = ?
+            """, (os_id,))
+            info = cursor.fetchone()
+
+            if not info:
+                db.close()
+                return jsonify({"sucesso": False, "mensagem": "❌ Ordem de Serviço não encontrada!"}), 404
+
+            if status == "Concluída":
+                percentual_int = 100
+                cursor.execute("""
+                    UPDATE ordens_servico
+                    SET status = ?, etapa = ?, percentual_conclusao = ?, observacoes = ?,
+                        data_encerramento = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                """, (status, etapa, percentual_int, observacoes, os_id))
+
+                # Registra automaticamente no histórico do veículo
+                cursor.execute("""
+                    INSERT INTO historico_servicos (veiculo_id, ordem_servico_id, tipo_servico, descricao, data_servico)
+                    VALUES (?, ?, ?, ?, DATE('now'))
+                """, (info["veiculo_id"], os_id, etapa or "Serviço concluído", observacoes))
+
+                tipo_notif = "conclusao"
+                mensagem_notif = (
+                    f"✅ Seu veículo {info['marca']} {info['modelo']} ({info['placa']}) "
+                    f"está pronto para retirada!"
+                )
+            else:
+                cursor.execute("""
+                    UPDATE ordens_servico
+                    SET status = ?, etapa = ?, percentual_conclusao = ?, observacoes = ?
+                    WHERE id = ?
+                """, (status, etapa, percentual_int, observacoes, os_id))
+
+                tipo_notif = "atualizacao"
+                etapa_txt = f" - Etapa: {etapa}" if etapa else ""
+                mensagem_notif = (
+                    f"🔧 Atualização no serviço do seu veículo {info['marca']} {info['modelo']} "
+                    f"({info['placa']}): {status}{etapa_txt} ({percentual_int}% concluído)"
+                )
+
+            # Gera a notificação automática para o cliente
+            cursor.execute("""
+                INSERT INTO notificacoes (cliente_id, veiculo_id, ordem_servico_id, tipo, mensagem)
+                VALUES (?, ?, ?, ?, ?)
+            """, (info["cliente_id"], info["veiculo_id"], os_id, tipo_notif, mensagem_notif))
+
+            db.commit()
+            db.close()
+
+            return jsonify({"sucesso": True, "mensagem": "✅ Status da Ordem de Serviço atualizado com sucesso!"}), 200
+
+        except Exception as e:
+            db.close()
+            return jsonify({"sucesso": False, "mensagem": f"❌ Erro ao atualizar: {str(e)}"}), 500
+
+    # GET: exibe o formulário já preenchido com os dados atuais da OS
+    cursor.execute("""
+        SELECT os.id, os.status, os.etapa, os.percentual_conclusao, os.observacoes,
+               c.nome as cliente_nome, v.marca, v.modelo, v.placa
+        FROM ordens_servico os
+        JOIN agendamentos a ON os.agendamento_id = a.id
+        JOIN clientes c ON a.cliente_id = c.id
+        JOIN veiculos v ON a.veiculo_id = v.id
+        WHERE os.id = ?
+    """, (os_id,))
+    ordem = cursor.fetchone()
+    db.close()
+
+    if not ordem:
+        return render_template("erro.html", mensagem="Ordem de Serviço não encontrada"), 404
+
+    return render_template("atualizar_status_ordem.html", os_id=os_id, ordem=ordem)
+
+
+@app.route("/notificacoes")
+def notificacoes():
+    """HU: Exibir as notificações geradas para o cliente (atualizações e conclusão de serviço).
+    Aceita opcionalmente ?cliente_id=<id> para filtrar por cliente."""
+    cliente_id = request.args.get("cliente_id", "").strip()
+
+    db = get_db()
+    cursor = db.cursor()
+
+    if cliente_id:
+        cursor.execute("""
+            SELECT n.id, n.tipo, n.mensagem, n.data_criacao, v.placa, v.marca, v.modelo
+            FROM notificacoes n
+            LEFT JOIN veiculos v ON n.veiculo_id = v.id
+            WHERE n.cliente_id = ?
+            ORDER BY n.data_criacao DESC
+        """, (cliente_id,))
+    else:
+        cursor.execute("""
+            SELECT n.id, n.tipo, n.mensagem, n.data_criacao, v.placa, v.marca, v.modelo
+            FROM notificacoes n
+            LEFT JOIN veiculos v ON n.veiculo_id = v.id
+            ORDER BY n.data_criacao DESC
+        """)
+
+    lista_notificacoes = cursor.fetchall()
+    db.close()
+
+    return render_template("notificacoes.html", notificacoes=lista_notificacoes)
+
+
+@app.route("/acompanhamento-servicos")
+def acompanhamento_servicos():
+    """HU: Permite ao cliente acompanhar em tempo real o status/progresso do serviço.
+    Aceita opcionalmente ?cliente_id=<id> para filtrar apenas os serviços de um cliente."""
+    cliente_id = request.args.get("cliente_id", "").strip()
+
+    db = get_db()
+    cursor = db.cursor()
+
+    query = """
+        SELECT os.id, os.status, os.etapa, os.percentual_conclusao,
+               os.data_abertura, os.data_encerramento,
+               a.descricao as descricao_agendamento,
+               v.marca, v.modelo, v.placa
+        FROM ordens_servico os
+        JOIN agendamentos a ON os.agendamento_id = a.id
+        JOIN veiculos v ON a.veiculo_id = v.id
+        WHERE os.status != 'Cancelada'
+    """
+    parametros = ()
+    if cliente_id:
+        query += " AND a.cliente_id = ?"
+        parametros = (cliente_id,)
+    query += " ORDER BY os.data_abertura DESC"
+
+    cursor.execute(query, parametros)
+    servicos = cursor.fetchall()
+    db.close()
+
+    return render_template("acompanhamento_servicos.html", servicos=servicos)
+
+
+@app.route("/veiculo/<int:veiculo_id>/historico")
+def historico_veiculo(veiculo_id):
+    """HU: Exibe o histórico completo de serviços realizados em um veículo,
+    além das últimas ordens de serviço registradas."""
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        SELECT v.id, v.placa, v.marca, v.modelo, v.ano, v.cor, c.nome as cliente_nome
+        FROM veiculos v
+        JOIN clientes c ON v.cliente_id = c.id
+        WHERE v.id = ?
+    """, (veiculo_id,))
+    veiculo = cursor.fetchone()
+
+    if not veiculo:
+        db.close()
+        return render_template("erro.html", mensagem="Veículo não encontrado"), 404
+
+    cursor.execute("""
+        SELECT data_servico, data_registro, tipo_servico, descricao, valor
+        FROM historico_servicos
+        WHERE veiculo_id = ?
+        ORDER BY data_servico DESC, data_registro DESC
+    """, (veiculo_id,))
+    historico = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT os.id, os.status, os.data_abertura, os.data_encerramento,
+               COALESCE(os.diagnostico, os.servicos_executados) as descricao
+        FROM ordens_servico os
+        JOIN agendamentos a ON os.agendamento_id = a.id
+        WHERE a.veiculo_id = ?
+        ORDER BY os.id DESC
+        LIMIT 10
+    """, (veiculo_id,))
+    ultimas_ordens = cursor.fetchall()
+
+    db.close()
+
+    return render_template(
+        "historico_veiculo.html",
+        veiculo=veiculo,
+        historico=historico,
+        ultimas_ordens=ultimas_ordens,
+    )
+
+
 # ==================== ERROS ====================
 
 
@@ -824,6 +1107,7 @@ def erro_servidor(error):
 
 if __name__ == "__main__":
     init_db()
+    migrar_banco()  # Cria/atualiza tabelas e colunas das novas funcionalidades
     # Debug=True permite recarregar automaticamente quando você modifica o código
     porta = int(os.environ.get("PORT", 5000))
     app.run(debug=False, host="0.0.0.0", port=porta)
